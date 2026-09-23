@@ -86,39 +86,44 @@ const MainContent: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-[#2C3B34] flex flex-col font-sans selection:bg-[#2E7D58] selection:text-white">
+    <div className="min-h-screen bg-[#FAF7F2] text-[#2C3B34] flex flex-col font-sans selection:bg-[#2E7D58] selection:text-white overflow-x-hidden relative">
       {/* Splash Screen */}
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
 
       {/* Persistent Administrator Bar for bhavnoorsinghkochar@gmail.com */}
       {isSuperAdmin && (
-        <div className="bg-[#C69234] text-[#143627] px-4 py-2 text-xs font-bold flex flex-wrap items-center justify-between gap-2 shadow-sm z-50">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#143627] animate-ping" />
-            <ShieldCheck className="w-4 h-4 text-[#143627]" />
-            <span>
-              Administrator Session: <strong>{adminEmail}</strong>
-              {activeTab === 'admin' ? ' · (Admin App Active)' : ' · (Previewing Customer App)'}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {activeTab !== 'admin' ? (
-              <button
-                id="top-switch-to-admin-btn"
-                onClick={() => setActiveTab('admin')}
-                className="px-3 py-1 rounded-lg bg-[#143627] text-white text-[11px] font-bold hover:bg-[#235D43] transition-colors shadow-xs"
-              >
-                Go to Admin App →
-              </button>
-            ) : (
-              <button
-                id="top-switch-to-customer-btn"
-                onClick={() => setActiveTab('home')}
-                className="px-3 py-1 rounded-lg bg-[#143627] text-white text-[11px] font-bold hover:bg-[#235D43] transition-colors shadow-xs"
-              >
-                Preview Customer App →
-              </button>
-            )}
+        <div className="bg-[#C69234] text-[#143627] px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold shadow-sm z-50">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-2 h-2 rounded-full bg-[#143627] animate-ping shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-[#143627] shrink-0" />
+              <div className="truncate text-[11px] sm:text-xs">
+                <span className="hidden sm:inline">Administrator Session: </span>
+                <strong className="truncate">{adminEmail}</strong>
+                <span className="hidden md:inline">
+                  {activeTab === 'admin' ? ' · (Admin App Active)' : ' · (Previewing Customer App)'}
+                </span>
+              </div>
+            </div>
+            <div className="shrink-0 flex items-center gap-2">
+              {activeTab !== 'admin' ? (
+                <button
+                  id="top-switch-to-admin-btn"
+                  onClick={() => setActiveTab('admin')}
+                  className="px-2.5 sm:px-3 py-1 rounded-lg bg-[#143627] text-white text-[11px] font-bold hover:bg-[#235D43] transition-colors shadow-xs cursor-pointer"
+                >
+                  Admin App →
+                </button>
+              ) : (
+                <button
+                  id="top-switch-to-customer-btn"
+                  onClick={() => setActiveTab('home')}
+                  className="px-2.5 sm:px-3 py-1 rounded-lg bg-[#143627] text-white text-[11px] font-bold hover:bg-[#235D43] transition-colors shadow-xs cursor-pointer"
+                >
+                  Customer App →
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -127,7 +132,7 @@ const MainContent: React.FC = () => {
       <Header />
 
       {/* Dynamic Content Views */}
-      <main className="flex-1">
+      <main className="flex-1 w-full pb-24 lg:pb-12">
         {activeTab === 'home' && <HomeView />}
         {activeTab === 'menu' && <MenuView />}
         {activeTab === 'cart' && <CartView />}
@@ -144,10 +149,10 @@ const MainContent: React.FC = () => {
       {/* Footer (Section 21) */}
       <footer
         id="app-footer"
-        className="bg-[#143627] text-white pt-12 pb-24 lg:pb-12 border-t border-[#1B4D36]"
+        className="bg-[#143627] text-white pt-10 sm:pt-12 pb-28 lg:pb-12 border-t border-[#1B4D36]"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-[#235D43]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-10 border-b border-[#235D43]">
             {/* Col 1: Brand Info */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">

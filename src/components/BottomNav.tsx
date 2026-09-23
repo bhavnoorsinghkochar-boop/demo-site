@@ -3,7 +3,15 @@ import { useApp } from '../context/AppContext';
 import { Home, BookOpen, ShoppingBag, Heart, User, ShieldCheck } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
-  const { activeTab, setActiveTab, cartTotalCount, orders, currentUser, userProfile, isSuperAdmin } = useApp();
+  const {
+    activeTab,
+    setActiveTab,
+    cartTotalCount,
+    orders,
+    currentUser,
+    userProfile,
+    isSuperAdmin,
+  } = useApp();
 
   const activeOrdersCount = orders.filter(
     (o) => o.status !== 'completed' && o.status !== 'cancelled'
@@ -27,7 +35,7 @@ export const BottomNav: React.FC = () => {
         ]),
     {
       id: 'account',
-      label: isSuperAdmin ? 'Admin' : currentUser ? (userProfile?.name?.split(' ')[0] || 'Account') : 'Account',
+      label: isSuperAdmin ? 'Profile' : currentUser ? (userProfile?.name?.split(' ')[0] || 'Account') : 'Account',
       icon: User,
       hasLiveOrder: activeOrdersCount > 0,
       isLoggedIn: !!currentUser,
@@ -37,7 +45,7 @@ export const BottomNav: React.FC = () => {
   return (
     <nav
       id="mobile-bottom-navigation"
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#E6DEC8] shadow-lg py-2 px-2"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#E6DEC8] shadow-lg py-1.5 sm:py-2 px-2 lg:hidden safe-area-bottom"
     >
       <div className="max-w-md mx-auto grid grid-cols-5 items-center">
         {navItems.map((item) => {

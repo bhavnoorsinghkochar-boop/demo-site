@@ -121,3 +121,4 @@ export type AppTab = 'home' | 'menu' | 'cart' | 'favourites' | 'account' | 'orde
 
 export type AppThemeId = 'emerald' | 'saffron' | 'midnight' | 'ruby' | 'ocean' | 'charcoal';
 export type AppFontId = 'cinzel' | 'playfair' | 'jakarta' | 'outfit' | 'inter';
+export type DeviceViewMode = 'responsive' | 'mobile';

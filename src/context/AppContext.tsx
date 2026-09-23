@@ -13,6 +13,7 @@ import {
   MenuCategoryType,
   AppThemeId,
   AppFontId,
+  DeviceViewMode,
 } from '../types';
 import { MENU_ITEMS } from '../data/menuData';
 import { INITIAL_RESTAURANT_SETTINGS, INITIAL_REVIEWS } from '../data/restaurantData';
@@ -60,7 +61,9 @@ interface ToastMessage {
 interface AppContextType {
   // Navigation & View State
   activeTab: AppTab;
-  setActiveTab: (tab: AppTab) => void;
+  setActiveTab: (tab: AppTab | ((prev: AppTab) => AppTab)) => void;
+  deviceViewMode: DeviceViewMode;
+  setDeviceViewMode: (mode: DeviceViewMode) => void;
   selectedCategory: string;
   setSelectedCategory: (cat: string) => void;
   selectedMenuType: MenuCategoryType;
@@ -169,6 +172,7 @@ const LOCAL_STORAGE_SETTINGS_KEY = 'madras_leaf_settings_v1';
 const LOCAL_STORAGE_MENU_KEY = 'madras_leaf_menu_v1';
 const LOCAL_STORAGE_REVIEWS_KEY = 'madras_leaf_reviews_v1';
 const LOCAL_STORAGE_ADMIN_KEY = 'madras_leaf_admin_v1';
+const LOCAL_STORAGE_VIEW_MODE_KEY = 'madras_leaf_view_mode_v1';
 const LOCAL_STORAGE_THEME_KEY = 'demo_app_theme_v1';
 const LOCAL_STORAGE_FONT_KEY = 'demo_app_font_v1';
 const LOCAL_STORAGE_THEME_CONFIGURED_KEY = 'demo_app_theme_configured_v1';
@@ -250,8 +254,84 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [currentTheme, currentFont]);
 
-  // Navigation State
-  const [activeTab, setActiveTab] = useState<AppTab>('home');
+  // Device View Mode (Allows testing the exact mobile app layout on desktop web)
+  const [deviceViewMode, setDeviceViewModeState] = useState<DeviceViewMode>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_VIEW_MODE_KEY) as DeviceViewMode;
+      return saved === 'mobile' ? 'mobile' : 'responsive';
+    } catch {
+      return 'responsive';
+    }
+  });
+
+  const setDeviceViewMode = (mode: DeviceViewMode) => {
+    setDeviceViewModeState(mode);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_VIEW_MODE_KEY, mode);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Navigation State with URL Hash Synchronization
+  const VALID_TABS: AppTab[] = [
+    'home',
+    'menu',
+    'cart',
+    'favourites',
+    'account',
+    'orders',
+    'reviews',
+    'about',
+    'gallery',
+    'location',
+    'admin',
+  ];
+
+  const getInitialTab = (): AppTab => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase() as AppTab;
+      if (VALID_TABS.includes(hash)) {
+        return hash;
+      }
+      const searchParams = new URLSearchParams(window.location.search);
+      const tabParam = searchParams.get('tab')?.toLowerCase() as AppTab;
+      if (tabParam && VALID_TABS.includes(tabParam)) {
+        return tabParam;
+      }
+    }
+    return 'home';
+  };
+
+  const [activeTab, setActiveTabState] = useState<AppTab>(getInitialTab);
+
+  const setActiveTab = (tabOrFn: AppTab | ((prev: AppTab) => AppTab)) => {
+    setActiveTabState((prev) => {
+      const nextTab = typeof tabOrFn === 'function' ? tabOrFn(prev) : tabOrFn;
+      if (typeof window !== 'undefined') {
+        try {
+          if (window.location.hash !== `#${nextTab}`) {
+            window.history.replaceState(null, '', `#${nextTab}`);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      return nextTab;
+    });
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase() as AppTab;
+      if (VALID_TABS.includes(hash)) {
+        setActiveTabState(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedMenuType, setSelectedMenuType] = useState<MenuCategoryType>('food');
   const [selectedDishForDetail, setSelectedDishForDetail] = useState<MenuItem | null>(null);
@@ -1001,6 +1081,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         activeTab,
         setActiveTab,
+        deviceViewMode,
+        setDeviceViewMode,
         selectedCategory,
         setSelectedCategory,
         selectedMenuType,

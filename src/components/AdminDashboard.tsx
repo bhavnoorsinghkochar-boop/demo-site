@@ -156,10 +156,10 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Admin Tab Selector */}
-      <div className="flex border-b border-[#E6DEC8]">
+      <div className="flex border-b border-[#E6DEC8] overflow-x-auto no-scrollbar">
         <button
           onClick={() => setCurrentTab('orders')}
-          className={`px-5 py-3 font-bold text-xs sm:text-sm border-b-2 flex items-center gap-2 transition-all ${
+          className={`px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 flex items-center gap-2 transition-all shrink-0 ${
             currentTab === 'orders'
               ? 'border-[#235D43] text-[#143627]'
               : 'border-transparent text-[#65736C] hover:text-[#143627]'
@@ -171,7 +171,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={() => setCurrentTab('menu')}
-          className={`px-5 py-3 font-bold text-xs sm:text-sm border-b-2 flex items-center gap-2 transition-all ${
+          className={`px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 flex items-center gap-2 transition-all shrink-0 ${
             currentTab === 'menu'
               ? 'border-[#235D43] text-[#143627]'
               : 'border-transparent text-[#65736C] hover:text-[#143627]'
@@ -183,7 +183,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={() => setCurrentTab('settings')}
-          className={`px-5 py-3 font-bold text-xs sm:text-sm border-b-2 flex items-center gap-2 transition-all ${
+          className={`px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 flex items-center gap-2 transition-all shrink-0 ${
             currentTab === 'settings'
               ? 'border-[#235D43] text-[#143627]'
               : 'border-transparent text-[#65736C] hover:text-[#143627]'

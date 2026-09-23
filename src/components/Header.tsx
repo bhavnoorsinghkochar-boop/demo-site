@@ -1,7 +1,15 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { isRestaurantOpen } from '../data/restaurantData';
-import { Phone, ShoppingBag, Heart, MapPin, Clock, Palette, User, ShieldCheck } from 'lucide-react';
+import {
+  Phone,
+  ShoppingBag,
+  Heart,
+  Clock,
+  Palette,
+  User,
+  ShieldCheck,
+} from 'lucide-react';
 
 export const Header: React.FC = () => {
   const {
@@ -30,8 +38,8 @@ export const Header: React.FC = () => {
       className="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-[#E6DEC8] transition-all"
     >
       {/* Top micro banner */}
-      <div className="bg-[#143627] text-[#FAF7F2] text-xs py-1.5 px-4 font-medium">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 text-center sm:text-left">
+      <div className="bg-[#143627] text-[#FAF7F2] text-xs py-1.5 font-medium">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 text-center sm:text-left">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#235d43] text-emerald-100 font-semibold tracking-wide text-[11px]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
@@ -61,12 +69,12 @@ export const Header: React.FC = () => {
 
       {/* Main navigation header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-3 sm:gap-4">
           {/* Logo brand area */}
           <button
             id="brand-logo-btn"
             onClick={() => setActiveTab('home')}
-            className="flex items-center gap-3 text-left group transition-transform active:scale-98"
+            className="flex items-center gap-2.5 sm:gap-3 text-left group transition-transform active:scale-98 min-w-0"
           >
             <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#143627] to-[#235D43] p-0.5 shadow-md flex items-center justify-center shrink-0">
               {/* Custom leaf SVG motif */}
@@ -93,14 +101,14 @@ export const Header: React.FC = () => {
               </svg>
             </div>
 
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-cinzel text-lg sm:text-2xl font-bold tracking-wider text-[#143627] uppercase line-clamp-1">
+                <span className="font-cinzel text-base sm:text-xl md:text-2xl font-bold tracking-wider text-[#143627] uppercase truncate">
                   {restaurantSettings.name}
                 </span>
-                <span className="hidden sm:inline-block w-2 h-2 rounded-full bg-[#235D43]" />
+                <span className="hidden sm:inline-block w-2 h-2 rounded-full bg-[#235D43] shrink-0" />
               </div>
-              <p className="text-[10px] sm:text-xs font-medium text-[#65736C] tracking-wide uppercase line-clamp-1">
+              <p className="text-[10px] sm:text-xs font-medium text-[#65736C] tracking-wide uppercase truncate">
                 {restaurantSettings.subtitle}
               </p>
             </div>
@@ -155,15 +163,15 @@ export const Header: React.FC = () => {
           </nav>
 
           {/* Right Action Icons */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Theme & Font Customizer Trigger Button */}
             <button
               id="header-theme-btn"
               onClick={() => setIsThemeModalOpen(true)}
               title="Customize App Theme & Font"
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#E6DEC8] bg-white hover:bg-[#EAE2D3] text-[#143627] text-xs font-bold transition-all shadow-2xs cursor-pointer"
+              className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-[#E6DEC8] bg-white hover:bg-[#EAE2D3] text-[#143627] text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0"
             >
-              <Palette className="w-3.5 h-3.5 text-[#C69234]" />
+              <Palette className="w-4 h-4 text-[#C69234]" />
               <span className="hidden sm:inline">Theme</span>
             </button>
 
@@ -183,12 +191,12 @@ export const Header: React.FC = () => {
               <span>{openStatusMessage}</span>
             </div>
 
-            {/* Favourites Icon */}
+            {/* Favourites Icon (Desktop & Tablet; on Mobile it is in BottomNav) */}
             <button
               id="header-favourites-btn"
               onClick={() => setActiveTab('favourites')}
               title="View Favourites"
-              className="relative p-2 sm:p-2.5 rounded-xl text-[#235D43] hover:bg-[#EAE2D3] transition-colors"
+              className="hidden sm:flex relative p-2 sm:p-2.5 rounded-xl text-[#235D43] hover:bg-[#EAE2D3] transition-colors shrink-0"
             >
               <Heart className="w-5 h-5" />
               {favourites.length > 0 && (
@@ -207,7 +215,7 @@ export const Header: React.FC = () => {
                 }
               }}
               title={currentUser ? `Logged in as ${userProfile?.name || currentUser.displayName || 'User'}` : 'Sign In / Register'}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer ${
+              className={`flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0 ${
                 currentUser
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-950 hover:bg-emerald-100'
                   : 'bg-white border-[#E6DEC8] text-[#143627] hover:bg-[#EAE2D3]'
@@ -216,7 +224,7 @@ export const Header: React.FC = () => {
               {currentUser ? (
                 isSuperAdmin ? (
                   <>
-                    <div className="w-5 h-5 rounded-full bg-[#143627] text-amber-300 flex items-center justify-center text-[10px] font-bold">
+                    <div className="w-5 h-5 rounded-full bg-[#143627] text-amber-300 flex items-center justify-center text-[10px] font-bold shrink-0">
                       👑
                     </div>
                     <span className="hidden sm:inline line-clamp-1 max-w-[85px] text-[#143627]">
@@ -225,7 +233,7 @@ export const Header: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <div className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px] font-bold">
+                    <div className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                       {userProfile?.name?.charAt(0) || currentUser.displayName?.charAt(0) || 'U'}
                     </div>
                     <span className="hidden sm:inline line-clamp-1 max-w-[80px]">
@@ -235,7 +243,7 @@ export const Header: React.FC = () => {
                 )
               ) : (
                 <>
-                  <User className="w-3.5 h-3.5 text-[#C69234]" />
+                  <User className="w-4 h-4 text-[#C69234]" />
                   <span className="hidden sm:inline">Sign In</span>
                 </>
               )}
@@ -245,7 +253,7 @@ export const Header: React.FC = () => {
             <button
               id="header-cart-btn"
               onClick={() => setActiveTab('cart')}
-              className="relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#143627] text-[#FAF7F2] font-semibold text-sm shadow-md hover:bg-[#235D43] transition-all active:scale-95 cursor-pointer"
+              className="relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl bg-[#143627] text-[#FAF7F2] font-semibold text-xs sm:text-sm shadow-md hover:bg-[#235D43] transition-all active:scale-95 cursor-pointer shrink-0"
             >
               <ShoppingBag className="w-4 h-4 text-[#C69234]" />
               <span className="hidden sm:inline">Cart</span>
