@@ -1,0 +1,191 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile containing personal information and display preferences",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "Unique Firebase Authentication UID"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Display name of the user"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Email address of the user"
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 30,
+          "description": "Contact phone number"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Account creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last profile update timestamp"
+        }
+      },
+      "required": ["userId", "name", "email"]
+    },
+    "UserOrder": {
+      "title": "UserOrder",
+      "description": "Order placed by a specific user with live tracking stages",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "Unique Order ID"
+        },
+        "orderNumber": {
+          "type": "string",
+          "maxLength": 30,
+          "description": "Display order identifier (e.g. ML-1234)"
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "UID of the owner user"
+        },
+        "date": {
+          "type": "string",
+          "maxLength": 50,
+          "description": "Order formatted date string"
+        },
+        "subtotal": {
+          "type": "number",
+          "description": "Subtotal before taxes and fees"
+        },
+        "tax": {
+          "type": "number",
+          "description": "Tax component"
+        },
+        "deliveryFee": {
+          "type": "number",
+          "description": "Delivery fee"
+        },
+        "grandTotal": {
+          "type": "number",
+          "description": "Final billed total"
+        },
+        "orderType": {
+          "type": "string",
+          "enum": ["delivery", "takeaway", "dine-in"],
+          "description": "Fulfillment method"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["placed", "confirmed", "preparing", "ready", "completed", "cancelled"],
+          "description": "Current lifecycle status"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["UPI", "Card", "Cash", "Pay at Counter"],
+          "description": "Payment option chosen"
+        },
+        "paymentStatus": {
+          "type": "string",
+          "enum": ["pending", "completed"],
+          "description": "Payment resolution status"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "orderNumber", "userId", "grandTotal", "orderType", "status"]
+    },
+    "UserFavourite": {
+      "title": "UserFavourite",
+      "description": "Favourite dish marked by a specific user",
+      "type": "object",
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "ID of the favourited menu item"
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "UID of the user"
+        },
+        "addedAt": {
+          "type": "string",
+          "description": "Timestamp when added"
+        }
+      },
+      "required": ["itemId", "userId"]
+    },
+    "UserCartItem": {
+      "title": "UserCartItem",
+      "description": "Cart item stored in a user's active persistent shopping cart",
+      "type": "object",
+      "properties": {
+        "cartItemId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "Unique cart item identifier"
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "maxLength": 128,
+          "description": "UID of the owner user"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity selected"
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "Price per unit"
+        },
+        "totalPrice": {
+          "type": "number",
+          "description": "Total price for this item line"
+        },
+        "specialInstructions": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Cooking notes or special requests"
+        }
+      },
+      "required": ["cartItemId", "userId", "quantity", "unitPrice", "totalPrice"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "Stores user personal profile isolated per authenticated user"
+    },
+    "/users/{userId}/orders/{orderId}": {
+      "schema": { "$ref": "UserOrder" },
+      "description": "Stores private orders isolated under each individual user"
+    },
+    "/users/{userId}/favourites/{itemId}": {
+      "schema": { "$ref": "UserFavourite" },
+      "description": "Stores private saved dishes isolated under each individual user"
+    },
+    "/users/{userId}/cart/{cartItemId}": {
+      "schema": { "$ref": "UserCartItem" },
+      "description": "Stores user active persistent cart items isolated per authenticated user"
+    }
+  }
+}

@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for UserProfile
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userId', 'name', 'email'])
+        && data.userId is string && data.userId.size() <= 128
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.email is string && data.email.size() <= 200
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 30));
+    }
+
+    // Validation for UserOrder
+    function isValidUserOrder(data) {
+      return data.keys().hasAll(['id', 'orderNumber', 'userId', 'grandTotal', 'orderType', 'status'])
+        && data.id is string && data.id.size() <= 128
+        && data.orderNumber is string && data.orderNumber.size() <= 50
+        && data.userId is string && data.userId == request.auth.uid
+        && data.grandTotal is number
+        && data.orderType in ['delivery', 'takeaway', 'dine-in']
+        && data.status in ['placed', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'];
+    }
+
+    // Validation for UserFavourite
+    function isValidUserFavourite(data) {
+      return data.keys().hasAll(['itemId', 'userId'])
+        && data.itemId is string && data.itemId.size() <= 128
+        && data.userId is string && data.userId == request.auth.uid;
+    }
+
+    // Validation for UserCartItem
+    function isValidUserCartItem(data) {
+      return data.keys().hasAll(['cartItemId', 'userId', 'quantity', 'unitPrice', 'totalPrice'])
+        && data.cartItemId is string && data.cartItemId.size() <= 128
+        && data.userId is string && data.userId == request.auth.uid
+        && data.quantity is number && data.quantity > 0
+        && data.unitPrice is number
+        && data.totalPrice is number
+        && (!('specialInstructions' in data) || (data.specialInstructions is string && data.specialInstructions.size() <= 500));
+    }
+
+    // User profile: only the owner can read/write their own profile
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && isValidId(userId) && incoming().userId == userId && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && incoming().userId == userId && isValidUserProfile(incoming());
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // Private Orders subcollection: strictly isolated per user
+      match /orders/{orderId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(orderId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(orderId) && incoming().userId == userId && isValidUserOrder(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(orderId) && incoming().userId == userId && isValidUserOrder(incoming());
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(orderId);
+      }
+
+      // Private Favourites subcollection: strictly isolated per user
+      match /favourites/{itemId} {
+        allow get, list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(itemId) && incoming().userId == userId && isValidUserFavourite(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(itemId) && incoming().userId == userId && isValidUserFavourite(incoming());
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(itemId);
+      }
+
+      // Private Cart subcollection: strictly isolated per user
+      match /cart/{cartItemId} {
+        allow get, list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(cartItemId) && incoming().userId == userId && isValidUserCartItem(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(cartItemId) && incoming().userId == userId && isValidUserCartItem(incoming());
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(cartItemId);
+      }
+    }
+  }
+}
