@@ -24,7 +24,6 @@ export const AuthModal: React.FC = () => {
     userProfile,
     loginWithEmailPassword,
     registerWithEmailPassword,
-    loginWithGoogle,
     logoutUser,
     showToast,
     restaurantSettings,
@@ -47,7 +46,7 @@ export const AuthModal: React.FC = () => {
     setError(null);
 
     if (!emailOrUsername.trim()) {
-      setError('Please enter your name or email address.');
+      setError('Please enter your username or email address.');
       return;
     }
 
@@ -65,7 +64,7 @@ export const AuthModal: React.FC = () => {
           return;
         }
         await registerWithEmailPassword(name.trim(), emailOrUsername.trim(), password, phone.trim());
-        showToast(`Welcome, ${name}! Your private account was created.`, 'success');
+        showToast(`Welcome, ${name}! Your account was created successfully.`, 'success');
       } else {
         await loginWithEmailPassword(emailOrUsername.trim(), password);
         showToast('Logged in successfully!', 'success');
@@ -74,29 +73,14 @@ export const AuthModal: React.FC = () => {
     } catch (err: any) {
       console.error('Auth error:', err);
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        setError('Invalid name/email or password. If you are new, please click "Create Account".');
+        setError('Invalid username/email or password. If you are new, click "Create Account".');
       } else if (err.code === 'auth/email-already-in-use') {
-        setError('An account with this email/name already exists. Please Sign In.');
+        setError('An account with this username or email already exists. Please Sign In.');
       } else if (err.code === 'auth/weak-password') {
         setError('Password is too weak. Please use at least 6 characters.');
       } else {
         setError(err.message || 'Authentication failed. Please check your credentials.');
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    setLoading(true);
-    try {
-      await loginWithGoogle();
-      showToast('Signed in with Google successfully!', 'success');
-      setIsAuthModalOpen(false);
-    } catch (err: any) {
-      console.error('Google Sign In Error:', err);
-      setError(err.message || 'Google sign-in could not be completed.');
     } finally {
       setLoading(false);
     }
@@ -152,15 +136,15 @@ export const AuthModal: React.FC = () => {
           <div className="flex items-center gap-2 mb-2">
             <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-emerald-200 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1">
               <ShieldCheck className="w-3 h-3 text-[#C69234]" />
-              Firebase Cloud Authentication
+              Username & Password Authentication
             </span>
           </div>
 
           <h2 className="text-xl sm:text-2xl font-bold font-cinzel">
-            {currentUser ? 'Your Account' : mode === 'login' ? 'Sign In to Your Account' : 'Create Your Account'}
+            {currentUser ? 'Your Account' : mode === 'login' ? 'Sign In with Credentials' : 'Create Your Account'}
           </h2>
           <p className="text-xs text-emerald-100/80 mt-1">
-            Each person has their own isolated orders, favourites, and live tracking.
+            Access your orders, cart, and favourites with your username and password.
           </p>
         </div>
 
@@ -315,42 +299,45 @@ export const AuthModal: React.FC = () => {
                 </div>
               )}
 
-              {/* Name / Email Input */}
+              {/* Name / Email / Username Input */}
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <label className="text-[11px] font-bold text-[#65736C]">
-                    {mode === 'register' ? 'Email or Username' : 'Name / Email'}
+                    {mode === 'register' ? 'Choose Username or Email' : 'Username or Email'}
                   </label>
-                  {emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() ? (
+                  {emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() ||
+                  emailOrUsername.trim().toLowerCase() === 'bhavnoorsinghkochar' ? (
                     <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded flex items-center gap-1">
                       <Crown className="w-3 h-3 text-amber-600" />
-                      Admin Email (Direct Admin App)
+                      Admin Access
                     </span>
                   ) : (
                     <span className="text-[10px] text-emerald-700 font-medium">
-                      Customer App Account
+                      Direct Credentials Login
                     </span>
                   )}
                 </div>
                 <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
                     required
                     value={emailOrUsername}
                     onChange={(e) => setEmailOrUsername(e.target.value)}
-                    placeholder={mode === 'register' ? 'bhavnoorsinghkochar@gmail.com or your email' : 'Enter email or name'}
+                    placeholder={mode === 'register' ? 'e.g. bhavnoor or customer@example.com' : 'Enter username or email'}
                     className={`w-full pl-9 pr-3 py-2.5 rounded-xl border text-xs font-semibold focus:outline-none bg-white ${
-                      emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
+                      emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() ||
+                      emailOrUsername.trim().toLowerCase() === 'bhavnoorsinghkochar'
                         ? 'border-amber-400 ring-2 ring-amber-200'
                         : 'border-[#E6DEC8] focus:border-[#2E7D58]'
                     }`}
                   />
                 </div>
                 <p className="text-[10px] text-[#65736C]">
-                  {emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
-                    ? '✨ Signing in with bhavnoorsinghkochar@gmail.com will directly launch the Admin App.'
-                    : 'Any other email will give you access to the Customer App.'}
+                  {emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() ||
+                  emailOrUsername.trim().toLowerCase() === 'bhavnoorsinghkochar'
+                    ? '✨ Admin credentials detected: signing in will launch the Admin App.'
+                    : 'You can enter your custom username or your email address with your password.'}
                 </p>
               </div>
 
@@ -395,55 +382,23 @@ export const AuthModal: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? (
                   <span>Processing...</span>
                 ) : (
                   <>
-                    <span>{mode === 'login' ? 'Sign In' : 'Create Account & Start Ordering'}</span>
+                    <span>{mode === 'login' ? 'Sign In with Username & Password' : 'Create Account & Start Ordering'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
 
-              {/* Divider */}
-              <div className="relative my-3">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#E6DEC8]" />
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase font-bold text-[#65736C]">
-                  <span className="bg-white px-2">Or continue with</span>
-                </div>
+              {/* Security Banner: Username & Password only */}
+              <div className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#E6DEC8] flex items-center gap-2 text-[11px] text-[#65736C]">
+                <Lock className="w-3.5 h-3.5 text-[#2E7D58] shrink-0" />
+                <span>Protected with username and password login. No third-party accounts required.</span>
               </div>
-
-              {/* Google Sign In */}
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={loading}
-                className="w-full py-2.5 rounded-xl border border-[#E6DEC8] bg-[#FAF7F2] hover:bg-[#EAE2D3] text-[#143627] text-xs font-bold transition-colors flex items-center justify-center gap-2"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                  />
-                </svg>
-                <span>Google Account</span>
-              </button>
 
               {/* Quick Switch Accounts (Role & Data Isolation Testing) */}
               <div className="pt-2 border-t border-[#E6DEC8]">

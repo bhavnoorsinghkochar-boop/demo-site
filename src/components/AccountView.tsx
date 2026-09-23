@@ -151,7 +151,7 @@ export const AccountView: React.FC = () => {
                     Logged in as <strong className="text-[#143627]">{userProfile?.name || currentUser.displayName}</strong>. Your cart, order history, and favourites are saved separately in Firestore scoped to your User ID.
                   </>
                 ) : (
-                  'Sign in with your name or Google Account to keep your cart, order history, and favourites saved.'
+                  'Sign in with your username/email and password to keep your cart, order history, and favourites saved.'
                 )}
               </span>
             </div>

@@ -20,7 +20,6 @@ import { INITIAL_RESTAURANT_SETTINGS, INITIAL_REVIEWS } from '../data/restaurant
 import {
   auth,
   db,
-  googleProvider,
   handleFirestoreError,
   OperationType,
 } from '../firebase';
@@ -28,7 +27,6 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
   signOut,
   updateProfile,
   User,
@@ -47,6 +45,7 @@ export interface UserProfile {
   userId: string;
   name: string;
   email: string;
+  username?: string;
   phone?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -81,7 +80,6 @@ interface AppContextType {
   setIsAuthModalOpen: (open: boolean) => void;
   loginWithEmailPassword: (emailOrUsername: string, password: string) => Promise<void>;
   registerWithEmailPassword: (name: string, emailOrUsername: string, password: string, phone?: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
   logoutUser: () => Promise<void>;
 
   // Cart
@@ -420,7 +418,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setCurrentUser(user);
       if (user) {
         const userEmail = (user.email || '').toLowerCase().trim();
-        const isAdminUser = userEmail === ADMIN_EMAIL.toLowerCase();
+        const isAdminUser =
+          userEmail === ADMIN_EMAIL.toLowerCase() ||
+          userEmail === `${ADMIN_EMAIL.split('@')[0].toLowerCase()}@restaurant.local`;
 
         setIsAdminLoggedIn(isAdminUser);
         if (isAdminUser) {
@@ -584,6 +584,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     pass: string,
     phone?: string
   ) => {
+    const isUsername = !emailOrUsername.includes('@');
     const email = normalizeEmail(emailOrUsername);
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(userCredential.user, { displayName: name });
@@ -591,6 +592,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       userId: userCredential.user.uid,
       name,
       email: userCredential.user.email || email,
+      username: isUsername ? emailOrUsername.trim().toLowerCase() : emailOrUsername.split('@')[0],
       phone: phone || '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -602,31 +604,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     setUserProfile(profile);
     setCurrentUser(userCredential.user);
-  };
-
-  const loginWithGoogle = async () => {
-    const userCredential = await signInWithPopup(auth, googleProvider);
-    const user = userCredential.user;
-    setCurrentUser(user);
-    const profileRef = doc(db, 'users', user.uid);
-    try {
-      const snap = await getDoc(profileRef);
-      if (!snap.exists()) {
-        const profile: UserProfile = {
-          userId: user.uid,
-          name: user.displayName || 'Google User',
-          email: user.email || '',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        await setDoc(profileRef, profile);
-        setUserProfile(profile);
-      } else {
-        setUserProfile(snap.data() as UserProfile);
-      }
-    } catch (err) {
-      handleFirestoreError(err, OperationType.WRITE, `users/${user.uid}`);
-    }
   };
 
   const logoutUser = async () => {
@@ -1098,7 +1075,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsAuthModalOpen,
         loginWithEmailPassword,
         registerWithEmailPassword,
-        loginWithGoogle,
         logoutUser,
         cart,
         addToCart,

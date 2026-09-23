@@ -2,5 +2,7 @@
   "name": "Madras Leaf - A Multi Cuisine Restaurant",
   "description": "Premium multi-cuisine dining and online ordering for Madras Leaf at Wave Mall, Ludhiana. Authentic South Indian, North Indian, Chinese, Biryani, Coffee & Beverages.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
