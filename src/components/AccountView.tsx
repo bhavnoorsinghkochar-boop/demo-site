@@ -12,6 +12,8 @@ import {
   User,
   Lock,
   ExternalLink,
+  Crown,
+  LogIn,
 } from 'lucide-react';
 import { AdminLoginModal } from './AdminLoginModal';
 
@@ -28,11 +30,15 @@ export const AccountView: React.FC = () => {
     setIsAuthModalOpen,
     logoutUser,
     showToast,
+    isSuperAdmin,
+    adminEmail,
   } = useApp();
 
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
-  const dinerName = userProfile?.name || currentUser?.displayName || orders[0]?.customerDetails?.name || 'Guest Diner';
+  const dinerName = isSuperAdmin
+    ? 'Bhavnoor Singh Kochar'
+    : userProfile?.name || currentUser?.displayName || orders[0]?.customerDetails?.name || 'Guest Diner';
   const dinerPhone = userProfile?.phone || orders[0]?.customerDetails?.phone;
 
   const activeOrders = orders.filter(
@@ -70,70 +76,99 @@ export const AccountView: React.FC = () => {
         </div>
       )}
 
-      {/* Profile Header & Firebase Account Session */}
-      <div className="p-6 rounded-3xl bg-white border border-[#E6DEC8] shadow-xs space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#143627] to-[#235D43] text-white flex items-center justify-center font-bold text-xl shadow-md">
-              {currentUser ? (
-                <span>{userProfile?.name?.charAt(0) || currentUser.displayName?.charAt(0) || 'U'}</span>
-              ) : (
-                <User className="w-8 h-8" />
-              )}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-[#143627] font-cinzel">
-                  {dinerName}
-                </h2>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                  currentUser ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-700'
-                }`}>
-                  {currentUser ? 'Firebase Account' : 'Guest'}
-                </span>
+        {/* Profile Header & Firebase Account Session */}
+        <div className="p-6 rounded-3xl bg-white border border-[#E6DEC8] shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md ${
+                isSuperAdmin
+                  ? 'bg-[#143627] text-amber-300 ring-2 ring-amber-400'
+                  : 'bg-gradient-to-br from-[#143627] to-[#235D43] text-white'
+              }`}>
+                {isSuperAdmin ? (
+                  <span>👑</span>
+                ) : currentUser ? (
+                  <span>{userProfile?.name?.charAt(0) || currentUser.displayName?.charAt(0) || 'U'}</span>
+                ) : (
+                  <User className="w-8 h-8" />
+                )}
               </div>
-              <p className="text-xs text-[#65736C] mt-0.5">
-                {currentUser?.email || (dinerPhone ? `${dinerPhone} · ` : '') + `${restaurantSettings.location}`}
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-[#143627] font-cinzel">
+                    {dinerName}
+                  </h2>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    isSuperAdmin
+                      ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                      : currentUser
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-gray-100 text-gray-700'
+                  }`}>
+                    {isSuperAdmin ? 'Administrator' : currentUser ? 'Customer Account' : 'Guest'}
+                  </span>
+                </div>
+                <p className="text-xs text-[#65736C] mt-0.5">
+                  {currentUser?.email || (dinerPhone ? `${dinerPhone} · ` : '') + `${restaurantSettings.location}`}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {isSuperAdmin ? (
+                <button
+                  id="account-open-admin-btn"
+                  onClick={() => setActiveTab('admin')}
+                  className="px-4 py-2 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+                >
+                  <Crown className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Open Admin App</span>
+                </button>
+              ) : null}
+
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="px-3.5 py-2 rounded-xl bg-[#FAF7F2] border border-[#E6DEC8] hover:bg-[#EAE2D3] text-[#143627] text-xs font-bold transition-colors shrink-0 shadow-2xs"
+              >
+                {currentUser ? 'Switch User' : 'Sign In / Register'}
+              </button>
             </div>
           </div>
 
-          <button
-            onClick={() => setIsAuthModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-[#FAF7F2] border border-[#E6DEC8] hover:bg-[#EAE2D3] text-[#143627] text-xs font-bold transition-colors shrink-0 shadow-2xs"
-          >
-            {currentUser ? 'Switch User' : 'Sign In / Register'}
-          </button>
-        </div>
+          {/* Data Isolation / Role Status Notice */}
+          <div className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs ${
+            isSuperAdmin ? 'bg-amber-50/70 border-amber-200' : 'bg-[#FAF7F2] border-[#E6DEC8]'
+          }`}>
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full shrink-0 ${isSuperAdmin ? 'bg-amber-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`} />
+              <span className="text-[#2C3B34] font-medium">
+                {isSuperAdmin ? (
+                  <>
+                    Logged in with <strong className="text-[#143627]">{adminEmail}</strong>. You have direct and full access to manage restaurant operations, incoming orders, and menu items.
+                  </>
+                ) : currentUser ? (
+                  <>
+                    Logged in as <strong className="text-[#143627]">{userProfile?.name || currentUser.displayName}</strong>. Your cart, order history, and favourites are saved separately in Firestore scoped to your User ID.
+                  </>
+                ) : (
+                  'Sign in with your name or Google Account to keep your cart, order history, and favourites saved.'
+                )}
+              </span>
+            </div>
 
-        {/* Data Isolation Status Notice */}
-        <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#E6DEC8] flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <span className="text-[#2C3B34] font-medium">
-              {currentUser ? (
-                <>
-                  Logged in as <strong className="text-[#143627]">{userProfile?.name || currentUser.displayName}</strong>. Your cart, order history, and favourites are saved separately in Firestore scoped to your User ID.
-                </>
-              ) : (
-                'Sign in with your name and password so your cart, order history, and favourites are saved separately to your unique profile.'
-              )}
-            </span>
+            {currentUser && (
+              <button
+                onClick={async () => {
+                  await logoutUser();
+                  showToast('Logged out from account', 'info');
+                }}
+                className="text-xs text-rose-600 hover:text-rose-700 font-bold shrink-0 underline cursor-pointer"
+              >
+                Log Out
+              </button>
+            )}
           </div>
-
-          {currentUser && (
-            <button
-              onClick={async () => {
-                await logoutUser();
-                showToast('Logged out from account', 'info');
-              }}
-              className="text-xs text-rose-600 hover:text-rose-700 font-bold shrink-0 underline"
-            >
-              Log Out
-            </button>
-          )}
         </div>
-      </div>
 
       {/* Account Quick Options Menu */}
       <div className="bg-white rounded-3xl border border-[#E6DEC8] shadow-xs overflow-hidden divide-y divide-[#E6DEC8]">
@@ -260,44 +295,73 @@ export const AccountView: React.FC = () => {
         </a>
       </div>
 
-      {/* SECTION 32: HIDDEN BUT ACCESSIBLE ADMIN ENTRY */}
-      {/* Placed at the very bottom of the Account page, after all normal user options */}
-      <div className="pt-6 border-t border-[#E6DEC8]/60 flex flex-col items-center justify-center text-center space-y-3">
-        <div className="text-[11px] text-[#A0AAA4]">
-          {restaurantSettings.name} · {restaurantSettings.location} · Version 1.0
+      {/* Role-Based Access Notice & Direct Admin Control */}
+      <div className="p-5 rounded-3xl bg-white border border-[#E6DEC8] shadow-xs space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-[#C69234]" />
+            <h3 className="text-xs font-bold text-[#143627] uppercase tracking-wider">
+              Platform Access & Roles
+            </h3>
+          </div>
+          <span className="text-[10px] text-gray-400 font-mono">
+            {restaurantSettings.name} v1.0
+          </span>
         </div>
 
-        {isAdminLoggedIn ? (
-          <div className="flex items-center gap-3 bg-[#E2F4EA] px-4 py-2 rounded-xl border border-[#2E7D58]/30">
-            <span className="text-xs text-[#143627] font-bold">
-              ✓ Logged in as Admin
-            </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-3 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-amber-950">
+              <Crown className="w-3.5 h-3.5 text-amber-600" />
+              <span>Admin App Access</span>
+            </div>
+            <p className="text-[11px] text-amber-900/80 leading-relaxed">
+              Exclusively authorized for <strong className="text-amber-950">{adminEmail}</strong>. Direct access to live orders, kitchen status, menu updates, and restaurant timings.
+            </p>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-emerald-950">
+              <User className="w-3.5 h-3.5 text-emerald-700" />
+              <span>Customer App Access</span>
+            </div>
+            <p className="text-[11px] text-emerald-900/80 leading-relaxed">
+              All other Gmail accounts and guests access the Customer App with isolated personal carts, favourites, and delivery tracking.
+            </p>
+          </div>
+        </div>
+
+        {isSuperAdmin ? (
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+              <span>You are currently authorized as the Administrator</span>
+            </div>
             <button
-              id="admin-dashboard-btn"
               onClick={() => setActiveTab('admin')}
-              className="text-xs font-bold text-[#235D43] underline hover:text-[#143627]"
+              className="px-4 py-2 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
             >
-              Open Console
-            </button>
-            <button
-              onClick={adminLogout}
-              className="text-xs text-rose-600 hover:text-rose-700 font-semibold"
-            >
-              Logout
+              <Crown className="w-3.5 h-3.5 text-amber-400" />
+              <span>Launch Admin Dashboard</span>
             </button>
           </div>
         ) : (
-          <button
-            id="hidden-admin-entry-btn"
-            onClick={() => setIsAdminModalOpen(true)}
-            className="text-[11px] text-[#93A199] hover:text-[#143627] transition-colors py-1 px-3 rounded hover:bg-[#EAE2D3]"
-          >
-            Admin
-          </button>
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-xs text-[#65736C]">
+              Are you the owner? Sign in with your admin email to manage the app.
+            </span>
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-950 text-xs font-bold transition-colors flex items-center gap-1.5"
+            >
+              <LogIn className="w-3.5 h-3.5 text-amber-700" />
+              <span>Admin Sign In</span>
+            </button>
+          </div>
         )}
       </div>
 
-      {/* Admin Login Modal */}
+      {/* Admin Login Modal (for password-based fallback if needed) */}
       <AdminLoginModal
         isOpen={isAdminModalOpen}
         onClose={() => setIsAdminModalOpen(false)}

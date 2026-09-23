@@ -27,16 +27,101 @@ import { ThemeFloatingTrigger } from './components/ThemeFloatingTrigger';
 import { LiveOrderPopup } from './components/LiveOrderPopup';
 import { AuthModal } from './components/AuthModal';
 import { Toast } from './components/Toast';
-import { Phone, MapPin, Clock, Heart } from 'lucide-react';
+import { Phone, MapPin, Clock, Heart, ShieldAlert, ShieldCheck, LogIn, ArrowRight } from 'lucide-react';
+
+const AdminRestrictedView: React.FC = () => {
+  const { currentUser, setIsAuthModalOpen, setActiveTab, adminEmail } = useApp();
+
+  return (
+    <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-6">
+      <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto shadow-sm border border-amber-200">
+        <ShieldAlert className="w-8 h-8 text-amber-700" />
+      </div>
+
+      <div className="space-y-2">
+        <h2 className="font-cinzel text-2xl font-bold text-[#143627]">
+          Administrator Access Required
+        </h2>
+        <p className="text-xs sm:text-sm text-[#65736C] leading-relaxed max-w-md mx-auto">
+          The Admin Portal is exclusively accessible to the authorized owner (<span className="font-semibold text-[#143627]">{adminEmail}</span>).
+        </p>
+        <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 max-w-md mx-auto text-left space-y-1">
+          <p className="font-bold flex items-center gap-1.5">
+            <span>Current Status:</span>
+            {currentUser ? (
+              <span className="text-emerald-700">Logged in as {currentUser.email} (Customer App)</span>
+            ) : (
+              <span className="text-amber-800">Browsing as Guest</span>
+            )}
+          </p>
+          <p className="text-[11px] text-amber-800/80">
+            All other Gmail accounts and guests are routed to the Customer App to view menus, place orders, and track deliveries.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <button
+          onClick={() => setIsAuthModalOpen(true)}
+          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all"
+        >
+          <LogIn className="w-4 h-4 text-[#C69234]" />
+          <span>Sign In with {adminEmail}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('home')}
+          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white border border-[#E6DEC8] hover:bg-[#FAF7F2] text-[#143627] text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+        >
+          <span>Return to Customer App</span>
+          <ArrowRight className="w-4 h-4 text-[#65736C]" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const MainContent: React.FC = () => {
-  const { activeTab, setActiveTab, restaurantSettings } = useApp();
+  const { activeTab, setActiveTab, restaurantSettings, isSuperAdmin, adminEmail } = useApp();
   const [showSplash, setShowSplash] = useState(true);
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#2C3B34] flex flex-col font-sans selection:bg-[#2E7D58] selection:text-white">
       {/* Splash Screen */}
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+
+      {/* Persistent Administrator Bar for bhavnoorsinghkochar@gmail.com */}
+      {isSuperAdmin && (
+        <div className="bg-[#C69234] text-[#143627] px-4 py-2 text-xs font-bold flex flex-wrap items-center justify-between gap-2 shadow-sm z-50">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#143627] animate-ping" />
+            <ShieldCheck className="w-4 h-4 text-[#143627]" />
+            <span>
+              Administrator Session: <strong>{adminEmail}</strong>
+              {activeTab === 'admin' ? ' · (Admin App Active)' : ' · (Previewing Customer App)'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {activeTab !== 'admin' ? (
+              <button
+                id="top-switch-to-admin-btn"
+                onClick={() => setActiveTab('admin')}
+                className="px-3 py-1 rounded-lg bg-[#143627] text-white text-[11px] font-bold hover:bg-[#235D43] transition-colors shadow-xs"
+              >
+                Go to Admin App →
+              </button>
+            ) : (
+              <button
+                id="top-switch-to-customer-btn"
+                onClick={() => setActiveTab('home')}
+                className="px-3 py-1 rounded-lg bg-[#143627] text-white text-[11px] font-bold hover:bg-[#235D43] transition-colors shadow-xs"
+              >
+                Preview Customer App →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Main App Header */}
       <Header />
@@ -53,7 +138,7 @@ const MainContent: React.FC = () => {
         {activeTab === 'location' && <LocationView />}
         {activeTab === 'gallery' && <GalleryView />}
         {activeTab === 'account' && <AccountView />}
-        {activeTab === 'admin' && <AdminDashboard />}
+        {activeTab === 'admin' && (isSuperAdmin ? <AdminDashboard /> : <AdminRestrictedView />)}
       </main>
 
       {/* Footer (Section 21) */}

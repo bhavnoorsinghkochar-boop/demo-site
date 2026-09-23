@@ -1,9 +1,9 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Home, BookOpen, ShoppingBag, Heart, User } from 'lucide-react';
+import { Home, BookOpen, ShoppingBag, Heart, User, ShieldCheck } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
-  const { activeTab, setActiveTab, cartTotalCount, orders, currentUser, userProfile } = useApp();
+  const { activeTab, setActiveTab, cartTotalCount, orders, currentUser, userProfile, isSuperAdmin } = useApp();
 
   const activeOrdersCount = orders.filter(
     (o) => o.status !== 'completed' && o.status !== 'cancelled'
@@ -13,10 +13,21 @@ export const BottomNav: React.FC = () => {
     { id: 'home', label: 'Home', icon: Home },
     { id: 'menu', label: 'Menu', icon: BookOpen },
     { id: 'cart', label: 'Cart', icon: ShoppingBag, badge: cartTotalCount },
-    { id: 'favourites', label: 'Favourites', icon: Heart },
+    ...(isSuperAdmin
+      ? [
+          {
+            id: 'admin',
+            label: 'Admin',
+            icon: ShieldCheck,
+            isAdmin: true,
+          },
+        ]
+      : [
+          { id: 'favourites', label: 'Favourites', icon: Heart },
+        ]),
     {
       id: 'account',
-      label: currentUser ? (userProfile?.name?.split(' ')[0] || 'Account') : 'Account',
+      label: isSuperAdmin ? 'Admin' : currentUser ? (userProfile?.name?.split(' ')[0] || 'Account') : 'Account',
       icon: User,
       hasLiveOrder: activeOrdersCount > 0,
       isLoggedIn: !!currentUser,

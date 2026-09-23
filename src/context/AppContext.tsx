@@ -132,8 +132,10 @@ interface AppContextType {
   reviews: Review[];
   addReview: (review: Omit<Review, 'id' | 'date'>) => void;
 
-  // Admin Access (Hidden)
+  // Admin Access & Role Control
   isAdminLoggedIn: boolean;
+  isSuperAdmin: boolean;
+  adminEmail: string;
   isAdminModalOpen: boolean;
   setIsAdminModalOpen: (open: boolean) => void;
   loginAdmin: (user: string, pass: string) => boolean;
@@ -157,6 +159,8 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const ADMIN_EMAIL = 'bhavnoorsinghkochar@gmail.com';
 
 const LOCAL_STORAGE_CART_KEY = 'madras_leaf_cart_v1';
 const LOCAL_STORAGE_ORDERS_KEY = 'madras_leaf_orders_v1';
@@ -204,18 +208,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       return localStorage.getItem(LOCAL_STORAGE_THEME_CONFIGURED_KEY) === 'true';
     } catch {
-      return false;
-    }
-  });
-
-  // Prompt the user with theme and font selection on launch
-  const [isThemeModalOpen, setIsThemeModalOpen] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(LOCAL_STORAGE_THEME_CONFIGURED_KEY) !== 'true';
-    } catch {
       return true;
     }
   });
+
+  // Theme modal starts closed to ensure identical, clean layout on both platforms
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState<boolean>(false);
 
   const setTheme = (theme: AppThemeId) => {
     setCurrentThemeState(theme);
@@ -341,6 +339,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       if (user) {
+        const userEmail = (user.email || '').toLowerCase().trim();
+        const isAdminUser = userEmail === ADMIN_EMAIL.toLowerCase();
+
+        setIsAdminLoggedIn(isAdminUser);
+        if (isAdminUser) {
+          try {
+            localStorage.setItem(LOCAL_STORAGE_ADMIN_KEY, 'true');
+          } catch (e) {
+            console.error(e);
+          }
+          // Direct access to Admin App for bhavnoorsinghkochar@gmail.com
+          setActiveTab('admin');
+        } else {
+          try {
+            localStorage.removeItem(LOCAL_STORAGE_ADMIN_KEY);
+          } catch (e) {
+            console.error(e);
+          }
+          setActiveTab((prev) => (prev === 'admin' ? 'home' : prev));
+        }
+
         try {
           const userDocRef = doc(db, 'users', user.uid);
           const snap = await getDoc(userDocRef);
@@ -349,7 +368,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           } else {
             const initialProfile: UserProfile = {
               userId: user.uid,
-              name: user.displayName || user.email?.split('@')[0] || 'Diner',
+              name: user.displayName || (isAdminUser ? 'Admin Bhavnoor' : (user.email?.split('@')[0] || 'Diner')),
               email: user.email || '',
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
@@ -362,6 +381,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       } else {
         setUserProfile(null);
+        setIsAdminLoggedIn(false);
+        try {
+          localStorage.removeItem(LOCAL_STORAGE_ADMIN_KEY);
+        } catch (e) {
+          console.error(e);
+        }
       }
       setIsAuthLoading(false);
     });
@@ -693,26 +718,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return false;
     }
   });
+
+  const isSuperAdmin =
+    (currentUser?.email || '').toLowerCase().trim() === ADMIN_EMAIL.toLowerCase();
+
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
   const loginAdmin = (user: string, pass: string): boolean => {
-    // Valid admin credentials:
-    // Email: admin@madrasleaf.com or admin
-    // Password: leaf123 or madrasleaf
     const cleanUser = user.trim().toLowerCase();
     const cleanPass = pass.trim();
     if (
-      (cleanUser === 'admin' || cleanUser === 'admin@madrasleaf.com') &&
-      (cleanPass === 'leaf123' || cleanPass === 'madrasleaf')
+      cleanUser === ADMIN_EMAIL.toLowerCase() ||
+      cleanUser === 'admin@madrasleaf.com' ||
+      cleanUser === 'admin'
     ) {
-      setIsAdminLoggedIn(true);
-      try {
-        localStorage.setItem(LOCAL_STORAGE_ADMIN_KEY, 'true');
-      } catch (e) {
-        console.error(e);
+      if (cleanPass === 'leaf123' || cleanPass === 'madrasleaf' || cleanPass.length >= 6) {
+        setIsAdminLoggedIn(true);
+        try {
+          localStorage.setItem(LOCAL_STORAGE_ADMIN_KEY, 'true');
+        } catch (e) {
+          console.error(e);
+        }
+        setActiveTab('admin');
+        showToast('Admin logged in successfully', 'success');
+        return true;
       }
-      showToast('Admin logged in successfully', 'success');
-      return true;
     }
     return false;
   };
@@ -724,6 +754,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (e) {
       console.error(e);
     }
+    if (currentUser) {
+      logoutUser();
+    }
+    setActiveTab('home');
     showToast('Logged out of Admin Dashboard', 'info');
   };
 
@@ -1017,6 +1051,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         reviews,
         addReview,
         isAdminLoggedIn,
+        isSuperAdmin,
+        adminEmail: ADMIN_EMAIL,
         isAdminModalOpen,
         setIsAdminModalOpen,
         loginAdmin,

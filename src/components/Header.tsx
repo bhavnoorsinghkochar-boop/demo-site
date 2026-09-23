@@ -15,6 +15,7 @@ export const Header: React.FC = () => {
     currentUser,
     userProfile,
     setIsAuthModalOpen,
+    isSuperAdmin,
   } = useApp();
 
   const activeOrdersCount = orders.filter(
@@ -135,6 +136,22 @@ export const Header: React.FC = () => {
                 )}
               </button>
             ))}
+
+            {isSuperAdmin && (
+              <button
+                id="header-nav-admin"
+                onClick={() => setActiveTab('admin')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all relative flex items-center gap-1.5 shadow-sm ${
+                  activeTab === 'admin'
+                    ? 'bg-[#C69234] text-[#143627] ring-2 ring-[#C69234]'
+                    : 'bg-[#143627] text-[#FAF7F2] hover:bg-[#235D43]'
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4 text-[#C69234]" />
+                <span>Admin App</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              </button>
+            )}
           </nav>
 
           {/* Right Action Icons */}
@@ -197,14 +214,25 @@ export const Header: React.FC = () => {
               }`}
             >
               {currentUser ? (
-                <>
-                  <div className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px] font-bold">
-                    {userProfile?.name?.charAt(0) || currentUser.displayName?.charAt(0) || 'U'}
-                  </div>
-                  <span className="hidden sm:inline line-clamp-1 max-w-[80px]">
-                    {userProfile?.name?.split(' ')[0] || currentUser.displayName?.split(' ')[0] || 'Account'}
-                  </span>
-                </>
+                isSuperAdmin ? (
+                  <>
+                    <div className="w-5 h-5 rounded-full bg-[#143627] text-amber-300 flex items-center justify-center text-[10px] font-bold">
+                      👑
+                    </div>
+                    <span className="hidden sm:inline line-clamp-1 max-w-[85px] text-[#143627]">
+                      Admin
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px] font-bold">
+                      {userProfile?.name?.charAt(0) || currentUser.displayName?.charAt(0) || 'U'}
+                    </div>
+                    <span className="hidden sm:inline line-clamp-1 max-w-[80px]">
+                      {userProfile?.name?.split(' ')[0] || currentUser.displayName?.split(' ')[0] || 'Account'}
+                    </span>
+                  </>
+                )
               ) : (
                 <>
                   <User className="w-3.5 h-3.5 text-[#C69234]" />

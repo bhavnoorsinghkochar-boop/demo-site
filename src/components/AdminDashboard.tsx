@@ -33,6 +33,9 @@ export const AdminDashboard: React.FC = () => {
     restaurantSettings,
     updateRestaurantSettings,
     setActiveTab,
+    adminEmail,
+    currentUser,
+    isSuperAdmin,
   } = useApp();
 
   const [currentTab, setCurrentTab] = useState<'orders' | 'menu' | 'settings'>('orders');
@@ -96,23 +99,23 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs uppercase font-bold tracking-widest text-[#C69234]">
-              Staff & Management Portal
+              Authorized Admin: {adminEmail}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold font-cinzel mt-1 uppercase">
             {restaurantSettings.name} Admin Console
           </h1>
           <p className="text-xs text-emerald-100/80 mt-0.5">
-            {restaurantSettings.location} · Live kitchen, order tracking and menu controls
+            Logged in as <strong className="text-white">{currentUser?.email || adminEmail}</strong> · Direct access to live kitchen, incoming orders, and menu catalog.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setActiveTab('home')}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition-colors"
+            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition-colors border border-white/20"
           >
-            Switch to Customer View
+            Preview Customer App
           </button>
           <button
             id="admin-logout-btn"

@@ -15,6 +15,10 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'bhavnoorsinghkochar@gmail.com';
+    }
+
     function isValidId(id) {
       return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
@@ -65,21 +69,21 @@ service cloud.firestore {
         && (!('specialInstructions' in data) || (data.specialInstructions is string && data.specialInstructions.size() <= 500));
     }
 
-    // User profile: only the owner can read/write their own profile
+    // User profile: owner or admin can read/manage profile
     match /users/{userId} {
-      allow get: if isOwner(userId) && isValidId(userId);
-      allow list: if false;
+      allow get: if (isOwner(userId) || isAdmin()) && isValidId(userId);
+      allow list: if isAdmin();
       allow create: if isOwner(userId) && isValidId(userId) && incoming().userId == userId && isValidUserProfile(incoming());
-      allow update: if isOwner(userId) && isValidId(userId) && incoming().userId == userId && isValidUserProfile(incoming());
-      allow delete: if isOwner(userId) && isValidId(userId);
+      allow update: if (isOwner(userId) || isAdmin()) && isValidId(userId);
+      allow delete: if (isOwner(userId) || isAdmin()) && isValidId(userId);
 
-      // Private Orders subcollection: strictly isolated per user
+      // Private Orders subcollection: strictly isolated per user, but admin can manage
       match /orders/{orderId} {
-        allow get: if isOwner(userId) && isValidId(userId) && isValidId(orderId);
-        allow list: if isOwner(userId) && isValidId(userId);
-        allow create: if isOwner(userId) && isValidId(userId) && isValidId(orderId) && incoming().userId == userId && isValidUserOrder(incoming());
-        allow update: if isOwner(userId) && isValidId(userId) && isValidId(orderId) && incoming().userId == userId && isValidUserOrder(incoming());
-        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(orderId);
+        allow get: if (isOwner(userId) || isAdmin()) && isValidId(userId) && isValidId(orderId);
+        allow list: if (isOwner(userId) || isAdmin()) && isValidId(userId);
+        allow create: if (isOwner(userId) || isAdmin()) && isValidId(userId) && isValidId(orderId);
+        allow update: if (isOwner(userId) || isAdmin()) && isValidId(userId) && isValidId(orderId);
+        allow delete: if (isOwner(userId) || isAdmin()) && isValidId(userId) && isValidId(orderId);
       }
 
       // Private Favourites subcollection: strictly isolated per user

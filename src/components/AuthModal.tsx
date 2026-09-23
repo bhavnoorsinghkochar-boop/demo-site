@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp, ADMIN_EMAIL } from '../context/AppContext';
 import {
   User,
   Lock,
@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Users,
+  ShieldAlert,
+  Crown,
 } from 'lucide-react';
 
 export const AuthModal: React.FC = () => {
@@ -26,6 +28,8 @@ export const AuthModal: React.FC = () => {
     logoutUser,
     showToast,
     restaurantSettings,
+    setActiveTab,
+    isSuperAdmin,
   } = useApp();
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -165,48 +169,90 @@ export const AuthModal: React.FC = () => {
           {currentUser ? (
             /* Logged In View */
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-lg">
-                  {userProfile?.name?.charAt(0) || currentUser.displayName?.charAt(0) || 'U'}
+              <div className={`p-4 rounded-2xl border flex items-center gap-3 ${
+                isSuperAdmin ? 'bg-amber-50/80 border-amber-300' : 'bg-emerald-50 border-emerald-200'
+              }`}>
+                <div className={`w-12 h-12 rounded-full text-white flex items-center justify-center font-bold text-lg ${
+                  isSuperAdmin ? 'bg-[#143627] text-amber-300 shadow-md ring-2 ring-amber-400' : 'bg-emerald-700'
+                }`}>
+                  {isSuperAdmin ? '👑' : (userProfile?.name?.charAt(0) || currentUser.displayName?.charAt(0) || 'U')}
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-emerald-950">
-                    {userProfile?.name || currentUser.displayName || 'Authenticated Diner'}
-                  </h3>
-                  <p className="text-xs text-emerald-700">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="font-bold text-sm text-[#143627]">
+                      {isSuperAdmin ? 'Bhavnoor Singh Kochar (Administrator)' : (userProfile?.name || currentUser.displayName || 'Authenticated Diner')}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-[#65736C]">
                     {currentUser.email || 'Email user'}
                   </p>
-                  <span className="inline-block mt-1 text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-200 text-emerald-900 font-semibold">
-                    UID: {currentUser.uid.slice(0, 10)}...
+                  <span className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded ${
+                    isSuperAdmin ? 'bg-amber-200 text-amber-900' : 'bg-emerald-200 text-emerald-900'
+                  }`}>
+                    {isSuperAdmin ? 'Role: Owner & Admin (Direct Admin App Access)' : 'Role: Customer (Private Cart & Orders)'}
                   </span>
                 </div>
               </div>
 
               <div className="text-xs text-[#65736C] space-y-1">
-                <p className="flex items-center gap-1 text-emerald-700 font-semibold">
-                  <CheckCircle2 className="w-4 h-4" />
-                  Your orders and favourites are securely saved separately in Firestore.
-                </p>
+                {isSuperAdmin ? (
+                  <p className="flex items-center gap-1 text-amber-800 font-semibold">
+                    <ShieldCheck className="w-4 h-4 text-[#C69234]" />
+                    You are verified as the administrator with full management rights.
+                  </p>
+                ) : (
+                  <p className="flex items-center gap-1 text-emerald-700 font-semibold">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Your personal cart, orders, and favourites are saved privately in Firestore.
+                  </p>
+                )}
               </div>
 
-              <div className="pt-2 flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await logoutUser();
-                    showToast('Logged out successfully', 'info');
-                  }}
-                  className="flex-1 py-2.5 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs font-bold transition-colors"
-                >
-                  Log Out
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsAuthModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold transition-colors"
-                >
-                  Done
-                </button>
+              <div className="pt-2 flex flex-col sm:flex-row items-center gap-2">
+                {isSuperAdmin ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('admin');
+                      setIsAuthModalOpen(false);
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
+                  >
+                    <Crown className="w-4 h-4 text-amber-400" />
+                    <span>Open Admin App</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('menu');
+                      setIsAuthModalOpen(false);
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2"
+                  >
+                    <span>Browse Customer Menu</span>
+                  </button>
+                )}
+
+                <div className="flex w-full sm:w-auto items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await logoutUser();
+                      showToast('Logged out successfully', 'info');
+                    }}
+                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs font-bold transition-colors"
+                  >
+                    Log Out
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAuthModalOpen(false)}
+                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#143627] text-xs font-bold transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
@@ -271,9 +317,21 @@ export const AuthModal: React.FC = () => {
 
               {/* Name / Email Input */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-[#65736C]">
-                  {mode === 'register' ? 'Email or Username' : 'Name / Email'}
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-[#65736C]">
+                    {mode === 'register' ? 'Email or Username' : 'Name / Email'}
+                  </label>
+                  {emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() ? (
+                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+                      <Crown className="w-3 h-3 text-amber-600" />
+                      Admin Email (Direct Admin App)
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-emerald-700 font-medium">
+                      Customer App Account
+                    </span>
+                  )}
+                </div>
                 <div className="relative">
                   <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
@@ -281,10 +339,19 @@ export const AuthModal: React.FC = () => {
                     required
                     value={emailOrUsername}
                     onChange={(e) => setEmailOrUsername(e.target.value)}
-                    placeholder={mode === 'register' ? 'e.g. bhavnoor@example.com or bhavnoor' : 'Enter your name or email'}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#E6DEC8] text-xs font-semibold focus:outline-none focus:border-[#2E7D58] bg-white"
+                    placeholder={mode === 'register' ? 'bhavnoorsinghkochar@gmail.com or your email' : 'Enter email or name'}
+                    className={`w-full pl-9 pr-3 py-2.5 rounded-xl border text-xs font-semibold focus:outline-none bg-white ${
+                      emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
+                        ? 'border-amber-400 ring-2 ring-amber-200'
+                        : 'border-[#E6DEC8] focus:border-[#2E7D58]'
+                    }`}
                   />
                 </div>
+                <p className="text-[10px] text-[#65736C]">
+                  {emailOrUsername.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
+                    ? '✨ Signing in with bhavnoorsinghkochar@gmail.com will directly launch the Admin App.'
+                    : 'Any other email will give you access to the Customer App.'}
+                </p>
               </div>
 
               {/* Password Input */}
@@ -378,12 +445,42 @@ export const AuthModal: React.FC = () => {
                 <span>Google Account</span>
               </button>
 
-              {/* Quick Switch Demo Accounts (Allows testing separate user data effortlessly) */}
+              {/* Quick Switch Accounts (Role & Data Isolation Testing) */}
               <div className="pt-2 border-t border-[#E6DEC8]">
-                <span className="text-[10px] font-bold text-[#65736C] uppercase tracking-wider block mb-2">
-                  ⚡ Quick Demo Accounts (Separate data per person):
-                </span>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-bold text-[#65736C] uppercase tracking-wider">
+                    ⚡ Quick Test Logins:
+                  </span>
+                  <span className="text-[10px] text-amber-700 font-semibold">
+                    Strict Role Separation
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleQuickDemoAccount(
+                        'Bhavnoor Singh Kochar',
+                        ADMIN_EMAIL,
+                        'bhavnoor123456'
+                      )
+                    }
+                    className="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-left transition-colors relative group"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Crown className="w-3.5 h-3.5 text-amber-600" />
+                      <span className="text-[11px] font-bold text-amber-950">
+                        Admin App Access
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-amber-800 font-semibold block truncate">
+                      {ADMIN_EMAIL}
+                    </span>
+                    <span className="text-[9px] text-amber-600/80 block mt-0.5">
+                      Directly opens Admin Portal
+                    </span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() =>
@@ -393,25 +490,20 @@ export const AuthModal: React.FC = () => {
                         'priya123456'
                       )
                     }
-                    className="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-left text-emerald-950 transition-colors"
+                    className="p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-left transition-colors"
                   >
-                    <span className="text-[11px] font-bold block">Priya Sharma</span>
-                    <span className="text-[9px] text-emerald-700">priya123456</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleQuickDemoAccount(
-                        'Rahul Verma',
-                        'rahul.verma@demo.com',
-                        'rahul123456'
-                      )
-                    }
-                    className="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-left text-amber-950 transition-colors"
-                  >
-                    <span className="text-[11px] font-bold block">Rahul Verma</span>
-                    <span className="text-[9px] text-amber-700">rahul123456</span>
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-emerald-700" />
+                      <span className="text-[11px] font-bold text-emerald-950">
+                        Customer App Access
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-emerald-800 font-semibold block">
+                      priya.sharma@demo.com
+                    </span>
+                    <span className="text-[9px] text-emerald-600/80 block mt-0.5">
+                      Private Cart & Orders
+                    </span>
                   </button>
                 </div>
               </div>
