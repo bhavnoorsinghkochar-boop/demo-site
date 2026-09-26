@@ -75,9 +75,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
               {restaurantSettings.subtitle}
             </p>
 
-            <div className="mt-4 flex items-center gap-2 text-xs text-emerald-200/90 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>100% Pure Vegetarian · {restaurantSettings.location}</span>
+            <div className="mt-4 flex items-center gap-2 text-xs text-red-200/90 font-medium">
+              <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
+              <span>Taste Of Singapore · {restaurantSettings.location}</span>
             </div>
 
             {/* Small animated loading bar */}

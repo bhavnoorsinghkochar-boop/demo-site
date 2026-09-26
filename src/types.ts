@@ -21,7 +21,7 @@ export interface MenuItem {
   category: string;
   menuType: MenuCategoryType;
   image: string;
-  vegetarian: boolean; // Madras Leaf is 100% pure veg!
+  vegetarian: boolean; // True for veg items (churros, bubble waffles, sodas, etc.)
   available: boolean;
   customizations?: CustomizationGroup[];
   spicyLevel?: 0 | 1 | 2 | 3;
@@ -119,6 +119,6 @@ export interface RestaurantSettings {
 
 export type AppTab = 'home' | 'menu' | 'cart' | 'favourites' | 'account' | 'orders' | 'reviews' | 'about' | 'gallery' | 'location' | 'admin';
 
-export type AppThemeId = 'emerald' | 'saffron' | 'midnight' | 'ruby' | 'ocean' | 'charcoal';
+export type AppThemeId = 'emerald' | 'saffron' | 'midnight' | 'ruby' | 'ocean' | 'charcoal' | 'singapore';
 export type AppFontId = 'cinzel' | 'playfair' | 'jakarta' | 'outfit' | 'inter';
 export type DeviceViewMode = 'responsive' | 'mobile';

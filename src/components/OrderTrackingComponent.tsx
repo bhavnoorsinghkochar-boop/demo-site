@@ -71,7 +71,7 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
     {
       status: 'preparing',
       label: 'Preparing',
-      description: 'Freshly cooking in 100% pure veg kitchen',
+      description: 'Freshly cooking your food in kitchen',
       icon: UtensilsCrossed,
     },
     {
@@ -82,7 +82,7 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
           ? 'Handed over to rider for delivery'
           : currentOrder.orderType === 'dine-in'
           ? 'Freshly plated & serving to table'
-          : 'Packed & ready at Wave Mall 1st fl. counter',
+          : 'Packed & ready at Booth No.20, Rajguru Nagar counter',
       icon: currentOrder.orderType === 'delivery' ? Bike : ShoppingBag,
     },
     {
@@ -132,9 +132,9 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
   const originAddress = `${restaurantSettings.name}, ${restaurantSettings.location}`;
   const destinationAddress =
     currentOrder.orderType === 'delivery'
-      ? currentOrder.customerDetails.address || 'Aggar Nagar, Ludhiana'
+      ? currentOrder.customerDetails?.address || 'Aggar Nagar, Ludhiana'
       : currentOrder.orderType === 'dine-in'
-      ? `Table ${currentOrder.customerDetails.tableNumber || '4'}, ${restaurantSettings.location}`
+      ? `Table ${currentOrder.customerDetails?.tableNumber || '4'}, ${restaurantSettings.location}`
       : `Takeaway Counter, ${restaurantSettings.location}`;
 
   // One-tap Google Maps Navigation URL
@@ -177,9 +177,9 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
             <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] border border-[#E6DEC8] text-[#143627] text-xs font-bold capitalize">
               {currentOrder.orderType}
             </span>
-            {currentOrder.customerDetails.tableNumber && currentOrder.orderType === 'dine-in' && (
+            {currentOrder.customerDetails?.tableNumber && currentOrder.orderType === 'dine-in' && (
               <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
-                Table {currentOrder.customerDetails.tableNumber}
+                Table {currentOrder.customerDetails?.tableNumber}
               </span>
             )}
           </div>
@@ -371,8 +371,8 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
                   {currentOrder.orderType === 'delivery'
                     ? 'Track dispatch and destination along Ferozpur Road'
                     : currentOrder.orderType === 'dine-in'
-                    ? 'Wave Mall 1st Floor dining & table location'
-                    : 'Wave Mall 1st Floor pickup counter'}
+                    ? 'Rajguru Nagar table & dining location'
+                    : 'Booth No.20, Rajguru Nagar pickup counter'}
                 </p>
               </div>
             </div>
@@ -460,7 +460,7 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
                         ? 'Rider Dispatched · En Route'
                         : currentOrder.status === 'completed'
                         ? 'Order Reached Destination'
-                        : 'Preparing at Wave Mall Kitchen'}
+                        : 'Preparing at Laa Mamma Mia Kitchen'}
                     </span>
                   </div>
 
@@ -530,8 +530,8 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
                       </span>
                       <span className="text-[9px] text-emerald-200/80 truncate max-w-[90px]">
                         {currentOrder.orderType === 'delivery'
-                          ? currentOrder.customerDetails.address?.split(',')[0] || 'Ludhiana'
-                          : 'Wave Mall'}
+                          ? currentOrder.customerDetails?.address?.split(',')[0] || 'Ludhiana'
+                          : 'Rajguru Nagar'}
                       </span>
                     </div>
                   </div>
@@ -540,7 +540,7 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
                 {/* Bottom Quick Call & Google Maps Navigation */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
                   <span className="text-[11px] text-emerald-100/80">
-                    Ludhiana Traffic: <strong>Normal flow on Ferozpur Road</strong>
+                    Ludhiana Traffic: <strong>Normal flow in Rajguru Nagar</strong>
                   </span>
 
                   <div className="flex items-center gap-2">
@@ -588,7 +588,7 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
                   rel="noopener noreferrer"
                   className="text-[11px] text-[#235D43] font-bold hover:underline inline-flex items-center gap-1"
                 >
-                  <span>View Wave Mall on Map</span>
+                  <span>View Store on Google Maps</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -607,12 +607,12 @@ export const OrderTrackingComponent: React.FC<OrderTrackingComponentProps> = ({
                 </span>
               </div>
               <p className="font-bold text-[#143627] text-xs">
-                {currentOrder.customerDetails.name} ({currentOrder.customerDetails.phone})
+                {currentOrder.customerDetails?.name || 'Customer'} {currentOrder.customerDetails?.phone ? `(${currentOrder.customerDetails.phone})` : ''}
               </p>
               <p className="text-[#65736C] text-[11px] leading-relaxed">
                 {destinationAddress}
               </p>
-              {currentOrder.customerDetails.notes && (
+              {currentOrder.customerDetails?.notes && (
                 <p className="text-[11px] text-amber-800 bg-amber-50 px-2 py-1 rounded-lg">
                   <strong>Notes:</strong> {currentOrder.customerDetails.notes}
                 </p>

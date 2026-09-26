@@ -105,48 +105,52 @@ export const FoodDetailModal: React.FC = () => {
           <X className="w-5 h-5" />
         </button>
 
-        {/* Large Header Image */}
-        <div className="relative h-60 sm:h-68 shrink-0 bg-gray-100">
-          <img
-            src={dish.image}
-            alt={dish.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
-
-          {/* Badges on Image */}
-          <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="flex items-center gap-1.5 bg-white px-2.5 py-0.5 rounded-full text-xs font-bold text-[#143627] shadow-sm">
-                  <span className="w-3.5 h-3.5 border-2 border-emerald-600 rounded-sm flex items-center justify-center p-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                  </span>
-                  <span>100% Pure Veg</span>
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-xs text-xs text-white">
-                  {dish.category}
-                </span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-cinzel drop-shadow-md">
-                {dish.name}
-              </h2>
+        {/* Clean Text Header (No Photo) */}
+        <div className="bg-gradient-to-r from-[#DC2626] to-[#991B1B] text-white p-5 sm:p-6 shrink-0 relative">
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="flex items-center gap-1.5 bg-white px-2.5 py-0.5 rounded-full text-xs font-bold text-[#143627] shadow-sm">
+                {dish.vegetarian ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-emerald-600 rounded-sm flex items-center justify-center p-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                    </span>
+                    <span className="text-emerald-800">Veg</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-rose-600 rounded-sm flex items-center justify-center p-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
+                    </span>
+                    <span className="text-rose-700">Non-Veg</span>
+                  </>
+                )}
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-xs text-white font-medium">
+                {dish.category}
+              </span>
             </div>
 
-            {/* Favourite toggle */}
-            <button
-              id="food-detail-fav-btn"
-              onClick={() => toggleFavourite(dish.id)}
-              className="p-3 rounded-full bg-white/95 hover:bg-white text-rose-500 shadow-xl transition-transform active:scale-90"
-              title="Add to Favourites"
-            >
-              <Heart
-                className={`w-5 h-5 ${
-                  isFavourite(dish.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-500'
-                }`}
-              />
-            </button>
+            <div className="flex items-center gap-2 mr-8">
+              {/* Favourite toggle */}
+              <button
+                id="food-detail-fav-btn"
+                onClick={() => toggleFavourite(dish.id)}
+                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-transform active:scale-90"
+                title="Save Favourite"
+              >
+                <Heart
+                  className={`w-4 h-4 ${
+                    isFavourite(dish.id) ? 'fill-white text-white' : 'text-white'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
+
+          <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
+            {dish.name}
+          </h2>
         </div>
 
         {/* Modal Scrollable Body */}
@@ -171,13 +175,13 @@ export const FoodDetailModal: React.FC = () => {
 
             {dish.pageNumber && (
               <p className="mt-1 text-[11px] text-[#65736C]">
-                Official Menu Page #{dish.pageNumber} · Madras Leaf Multi Cuisine
+                Official Menu · Laa Mamma Mia! Taste Of Singapore
               </p>
             )}
           </div>
 
           {/* Customization Options */}
-          {dish.customizations && dish.customizations.length > 0 && (
+          {Array.isArray(dish.customizations) && dish.customizations.length > 0 && (
             <div className="space-y-4 pt-2 border-t border-[#E6DEC8]">
               {dish.customizations.map((group) => (
                 <div key={group.id} className="space-y-2">
@@ -191,7 +195,7 @@ export const FoodDetailModal: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {group.options.map((opt) => {
+                    {Array.isArray(group.options) && group.options.map((opt) => {
                       const isSelected = selectedCustomizations.some(
                         (c) => c.groupName === group.name && c.optionName === opt.name
                       );

@@ -72,7 +72,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
     {
       status: 'placed',
       label: 'Placed',
-      sublabel: 'Order received at Madras Leaf',
+      sublabel: 'Order received at Laa Mamma Mia',
       icon: Receipt,
     },
     {
@@ -84,7 +84,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
     {
       status: 'preparing',
       label: 'Preparing',
-      sublabel: 'Cooking fresh in pure veg kitchen',
+      sublabel: 'Freshly cooking in our kitchen',
       icon: UtensilsCrossed,
     },
     {
@@ -95,7 +95,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
           ? 'Out with delivery rider'
           : currentOrder?.orderType === 'dine-in'
           ? 'Serving to your table'
-          : 'Ready at Wave Mall 1st fl. counter',
+          : 'Ready at Booth No.20, Rajguru Nagar counter',
       icon: currentOrder?.orderType === 'delivery' ? Bike : ShoppingBag,
     },
     {
@@ -175,9 +175,9 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
         </p>
         <button
           onClick={() => setActiveTab('menu')}
-          className="px-4 py-2 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold transition-all"
+          className="px-4 py-2 rounded-xl bg-[#DC2626] hover:bg-[#b91c1c] text-white text-xs font-bold transition-all"
         >
-          Explore Madras Leaf Menu
+          Explore Laa Mamma Mia Menu
         </button>
       </div>
     );
@@ -205,9 +205,9 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
             <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] border border-[#E6DEC8] text-[#143627] text-xs font-bold capitalize">
               {currentOrder.orderType}
             </span>
-            {currentOrder.customerDetails.tableNumber && (
+            {currentOrder.customerDetails?.tableNumber && (
               <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-bold">
-                Table {currentOrder.customerDetails.tableNumber}
+                Table {currentOrder.customerDetails?.tableNumber}
               </span>
             )}
           </div>
@@ -422,7 +422,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
               <div>
                 <span className="text-[#65736C] block text-[11px]">Customer Contact</span>
                 <span className="font-bold text-[#143627]">
-                  {currentOrder.customerDetails.name} ({currentOrder.customerDetails.phone})
+                  {currentOrder.customerDetails?.name || 'Customer'} ({currentOrder.customerDetails?.phone || 'On file'})
                 </span>
               </div>
 
@@ -436,14 +436,14 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
                 </span>
                 <span className="font-bold text-[#143627]">
                   {currentOrder.orderType === 'delivery'
-                    ? currentOrder.customerDetails.address
+                    ? currentOrder.customerDetails?.address || 'Ludhiana'
                     : currentOrder.orderType === 'dine-in'
-                    ? `Table ${currentOrder.customerDetails.tableNumber || 'Main Dining Hall'}`
-                    : '1st Floor Counter, Wave Mall, Ludhiana'}
+                    ? `Table ${currentOrder.customerDetails?.tableNumber || 'Main Dining Hall'}`
+                    : 'Booth No.20, Main Market, Rajguru Nagar, Ludhiana'}
                 </span>
               </div>
 
-              {currentOrder.customerDetails.notes && (
+              {currentOrder.customerDetails?.notes && (
                 <div className="sm:col-span-2 text-gray-600 bg-[#FAF7F2] p-2 rounded-lg">
                   <strong>Special Instructions:</strong> {currentOrder.customerDetails.notes}
                 </div>
@@ -504,13 +504,13 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
               </a>
 
               <a
-                href="https://maps.google.com/?q=Wave+Mall+Ludhiana+Madras+Leaf"
+                href="https://maps.google.com/?q=Laa+Mamma+Mia+Rajguru+Nagar+Ludhiana"
                 target="_blank"
                 rel="noreferrer"
                 className="px-4 py-2 rounded-xl bg-[#FAF7F2] hover:bg-[#EAE2D3] text-[#143627] text-xs font-bold flex items-center gap-1.5 transition-colors"
               >
-                <MapPin className="w-3.5 h-3.5 text-[#C69234]" />
-                <span>Wave Mall Directions</span>
+                <MapPin className="w-3.5 h-3.5 text-[#DC2626]" />
+                <span>Rajguru Nagar Directions</span>
               </a>
             </div>
           </div>

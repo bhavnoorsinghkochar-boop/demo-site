@@ -22,11 +22,11 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { FoodDetailModal } from './components/FoodDetailModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { OrderConfirmationModal } from './components/OrderConfirmationModal';
-import { ThemeCustomizerModal } from './components/ThemeCustomizerModal';
-import { ThemeFloatingTrigger } from './components/ThemeFloatingTrigger';
+import { WhatsAppFloatingWidget } from './components/WhatsAppButton';
 import { LiveOrderPopup } from './components/LiveOrderPopup';
 import { AuthModal } from './components/AuthModal';
 import { Toast } from './components/Toast';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Phone, MapPin, Clock, Heart, ShieldAlert, ShieldCheck, LogIn, ArrowRight } from 'lucide-react';
 
 const AdminRestrictedView: React.FC = () => {
@@ -163,12 +163,12 @@ const MainContent: React.FC = () => {
               <p className="text-xs uppercase font-semibold tracking-wider text-[#C69234]">
                 {restaurantSettings.subtitle}
               </p>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 text-emerald-200 text-xs font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                100% Pure Vegetarian
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 text-red-200 text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                🇸🇬 Taste Of Singapore
               </div>
-              <p className="text-xs text-emerald-100/80 leading-relaxed">
-                Combining authentic South Indian heritage with North Indian tandoor, Asian woks, and handcrafted cafe beverages.
+              <p className="text-xs text-red-100/90 leading-relaxed">
+                Unique & flavorful burgers, handcrafted churros, bubble waffles, and refreshing shakes & mocktails in Rajguru Nagar, Ludhiana.
               </p>
             </div>
 
@@ -259,7 +259,7 @@ const MainContent: React.FC = () => {
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-emerald-200/70">
             <p>© {new Date().getFullYear()} {restaurantSettings.name}. All rights reserved.</p>
             <p className="flex items-center gap-1">
-              <span>Pure vegetarian culinary experience · {restaurantSettings.location}</span>
+              <span>Taste Of Singapore · Desserts, Burgers & Shakes · {restaurantSettings.location}</span>
             </p>
           </div>
         </div>
@@ -272,8 +272,7 @@ const MainContent: React.FC = () => {
       <FoodDetailModal />
       <CheckoutModal />
       <OrderConfirmationModal />
-      <ThemeCustomizerModal />
-      <ThemeFloatingTrigger />
+      <WhatsAppFloatingWidget />
       <LiveOrderPopup />
       <AuthModal />
       <Toast />
@@ -283,8 +282,10 @@ const MainContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AppProvider>
-      <MainContent />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <MainContent />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

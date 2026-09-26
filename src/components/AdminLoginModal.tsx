@@ -57,8 +57,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <h3 className="font-cinzel text-xl font-bold tracking-wide">
             Staff & Admin Portal
           </h3>
-          <p className="text-xs text-emerald-200/90 mt-1">
-            Madras Leaf Multi Cuisine Restaurant
+          <p className="text-xs text-red-200/90 mt-1">
+            Laa Mamma Mia! Taste Of Singapore · Rajguru Nagar
           </p>
         </div>
 

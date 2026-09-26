@@ -145,7 +145,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="p-4 rounded-2xl bg-white border border-[#E6DEC8] shadow-xs">
           <span className="text-xs text-[#65736C] font-semibold">Menu Catalog</span>
           <div className="text-2xl font-extrabold text-[#143627] mt-1">{menuItems.length}</div>
-          <span className="text-[11px] text-[#2E7D58] font-medium">100% Pure Veg items</span>
+          <span className="text-[11px] text-[#DC2626] font-medium">Active menu items</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-white border border-[#E6DEC8] shadow-xs">
@@ -226,7 +226,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
               </div>
 
-              {orders.map((ord) => (
+              {(orders || []).map((ord) => (
                 <div
                   key={ord.id}
                   className="p-5 rounded-2xl bg-white border border-[#E6DEC8] shadow-xs space-y-3"
@@ -279,18 +279,18 @@ export const AdminDashboard: React.FC = () => {
                 {/* Customer Details */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#4A5550] bg-[#FAF7F2] p-3 rounded-xl">
                   <div>
-                    <strong>Customer:</strong> {ord.customerDetails.name} ({ord.customerDetails.phone})
+                    <strong>Customer:</strong> {ord.customerDetails?.name || 'Customer'} {ord.customerDetails?.phone ? `(${ord.customerDetails.phone})` : ''}
                   </div>
                   <div>
                     {ord.orderType === 'delivery' ? (
-                      <span><strong>Address:</strong> {ord.customerDetails.address}</span>
+                      <span><strong>Address:</strong> {ord.customerDetails?.address || 'Ludhiana'}</span>
                     ) : ord.orderType === 'dine-in' ? (
-                      <span><strong>Table:</strong> {ord.customerDetails.tableNumber || 'Main Hall'}</span>
+                      <span><strong>Table:</strong> {ord.customerDetails?.tableNumber || 'Main Hall'}</span>
                     ) : (
                       <span><strong>Type:</strong> Pickup at Counter</span>
                     )}
                   </div>
-                  {ord.customerDetails.notes && (
+                  {ord.customerDetails?.notes && (
                     <div className="sm:col-span-2 text-gray-500">
                       <strong>Notes:</strong> {ord.customerDetails.notes}
                     </div>
@@ -434,7 +434,7 @@ export const AdminDashboard: React.FC = () => {
           {/* Menu Items Table / Cards */}
           <div className="bg-white rounded-2xl border border-[#E6DEC8] overflow-hidden shadow-xs">
             <div className="divide-y divide-[#E6DEC8]">
-              {menuItems
+              {(menuItems || [])
                 .filter((i) =>
                   menuSearch ? i.name.toLowerCase().includes(menuSearch.toLowerCase()) : true
                 )

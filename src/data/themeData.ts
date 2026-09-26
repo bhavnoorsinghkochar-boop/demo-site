@@ -1,4 +1,4 @@
-export type AppThemeId = 'emerald' | 'saffron' | 'midnight' | 'ruby' | 'ocean' | 'charcoal';
+export type AppThemeId = 'singapore' | 'emerald' | 'saffron' | 'midnight' | 'ruby' | 'ocean' | 'charcoal';
 export type AppFontId = 'cinzel' | 'playfair' | 'jakarta' | 'outfit' | 'inter';
 
 export interface ThemeConfig {
@@ -36,6 +36,21 @@ export interface DemoBrandPreset {
 }
 
 export const THEMES: Record<AppThemeId, ThemeConfig> = {
+  singapore: {
+    id: 'singapore',
+    name: 'Singapore Red & White',
+    subtitle: 'Vibrant Crimson & Clean White',
+    description: 'Iconic Singaporean street food & dessert theme. Bold red highlights with clean modern white aesthetics.',
+    primary: '#DC2626',
+    secondary: '#991B1B',
+    accent: '#EF4444',
+    bg: '#FFFBFB',
+    cardBg: '#FFFFFF',
+    border: '#FECACA',
+    text: '#450A0A',
+    badgeBg: '#FEE2E2',
+    badgeText: '#991B1B',
+  },
   emerald: {
     id: 'emerald',
     name: 'Heritage Emerald',
@@ -174,31 +189,24 @@ export const FONTS: Record<AppFontId, FontConfig> = {
 
 export const DEMO_BRAND_PRESETS: DemoBrandPreset[] = [
   {
-    id: 'white-label',
-    name: 'Your Restaurant Name',
-    subtitle: 'A Multi Cuisine Dining Experience',
-    location: 'Your City Centre & Delivery Hub',
-    badge: 'White-Label Demo',
+    id: 'laa-mamma-mia',
+    name: 'Laa Mamma Mia! Taste Of Singapore',
+    subtitle: 'Taste Of Singapore · Desserts, Burgers & Shakes',
+    location: 'Booth No.20, Main Market, Rajguru Nagar, Ludhiana',
+    badge: 'Official Brand',
   },
   {
     id: 'showcase',
-    name: 'Restaurant Showcase Demo',
-    subtitle: 'Interactive Mobile & Web Ordering App',
-    location: '1st Floor Food Gallery, City Centre',
-    badge: 'Universal Demo',
+    name: 'Laa Mamma Mia! Dessert Shop',
+    subtitle: 'Churros, Bubble Waffles & Shakes',
+    location: 'Main Market, Rajguru Nagar, Ludhiana',
+    badge: 'Dessert Hub',
   },
   {
     id: 'heritage',
-    name: 'The Heritage Kitchen',
-    subtitle: 'Authentic Multi-Cuisine & Cafe',
-    location: 'Mall Promenade, Central District',
-    badge: 'Heritage Preset',
-  },
-  {
-    id: 'urban',
-    name: 'Urban Bistro & Lounge',
-    subtitle: 'Craft Kitchen, Shakes & Coffee Bar',
-    location: 'Wave Walk, West Avenue',
-    badge: 'Modern Preset',
+    name: 'Taste Of Singapore Hawker Express',
+    subtitle: 'Street Food, Burgers & Mocktails',
+    location: 'Rajguru Nagar, Ludhiana',
+    badge: 'Street Food',
   },
 ];

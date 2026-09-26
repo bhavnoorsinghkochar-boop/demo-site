@@ -33,8 +33,8 @@ export const MenuView: React.FC = () => {
 
   // Derive available categories for the active menuType (Food vs Beverage)
   const availableCategories = useMemo(() => {
-    const items = menuItems.filter((i) => i.menuType === selectedMenuType);
-    const cats = Array.from(new Set(items.map((i) => i.category)));
+    const items = (menuItems || []).filter((i) => i.menuType === selectedMenuType);
+    const cats = Array.from(new Set(items.map((i) => i.category).filter(Boolean)));
     return ['All', ...cats];
   }, [menuItems, selectedMenuType]);
 
@@ -80,18 +80,16 @@ export const MenuView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 border-2 border-emerald-600 rounded-sm flex items-center justify-center p-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-            </span>
-            <span className="text-xs uppercase font-bold tracking-widest text-[#235D43]">
-              100% Pure Vegetarian
+            <span className="text-base">🇸🇬</span>
+            <span className="text-xs uppercase font-bold tracking-widest text-[#DC2626]">
+              Taste Of Singapore · Desserts & Burgers
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#143627] font-cinzel mt-1">
             Our Menu
           </h1>
           <p className="text-xs sm:text-sm text-[#65736C] mt-1">
-            Authentic South Indian delights, North Indian classics, Chinese, Continental & Beverages
+            Handcrafted churros, bubble waffles, signature burgers, Asian bowls, and refreshing sodas
           </p>
         </div>
 
@@ -264,104 +262,103 @@ export const MenuView: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
           {filteredDishes.map((dish) => (
             <div
               key={dish.id}
               id={`food-card-${dish.id}`}
-              className="bg-white rounded-2xl border border-[#E6DEC8] overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col justify-between group"
+              className="bg-white rounded-2xl border border-[#E6DEC8] p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-[#DC2626]/40 transition-all flex flex-col justify-between group"
             >
-              {/* Image & Badges */}
-              <div
-                className="relative h-44 sm:h-48 overflow-hidden cursor-pointer"
-                onClick={() => setSelectedDishForDetail(dish)}
-              >
-                <img
-                  src={dish.image}
-                  alt={dish.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-
-                {/* Pure Veg Badge */}
-                <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-bold text-[#143627] shadow-sm">
-                  <span className="w-3 h-3 border-2 border-emerald-600 rounded-sm flex items-center justify-center p-0.5">
-                    <span className="w-1 h-1 rounded-full bg-emerald-600" />
-                  </span>
-                  <span>Pure Veg</span>
-                </div>
-
-                {/* Special Tag */}
-                {dish.isSpecial && (
-                  <span className="absolute bottom-2 left-2.5 px-2 py-0.5 rounded-md bg-[#C69234] text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                    Special
-                  </span>
-                )}
-
-                {/* Heart Button */}
-                <button
-                  id={`card-fav-btn-${dish.id}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavourite(dish.id);
-                  }}
-                  className="absolute top-2.5 right-2.5 p-1.5 rounded-full bg-white/90 hover:bg-white text-rose-500 shadow-md transition-transform active:scale-90"
-                  title="Favourite"
-                >
-                  <Heart
-                    className={`w-3.5 h-3.5 ${
-                      isFavourite(dish.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-600'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <div
-                  className="cursor-pointer"
-                  onClick={() => setSelectedDishForDetail(dish)}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-bold text-[#143627] text-sm sm:text-base group-hover:text-[#235D43] transition-colors leading-snug">
-                      {dish.name}
-                    </h3>
-                  </div>
-
-                  <p className="mt-1 text-xs text-[#65736C] line-clamp-2 leading-relaxed">
-                    {dish.description}
-                  </p>
-                </div>
-
-                {/* Footer with Price and Add Button */}
-                <div className="mt-3 pt-3 border-t border-[#F0EAE1] flex items-center justify-between">
-                  <div>
-                    <span className="text-xs font-semibold text-[#65736C]">₹</span>
-                    <span className="text-lg font-extrabold text-[#143627] ml-0.5">
-                      {dish.price}
+              <div>
+                {/* Header row: Veg/Non-Veg icon, Category, and Heart */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    {/* Authentic Veg / Non-Veg dot badge */}
+                    <span
+                      title={dish.vegetarian ? 'Vegetarian' : 'Non-Vegetarian'}
+                      className={`w-4 h-4 border-2 rounded-xs flex items-center justify-center p-0.5 shrink-0 ${
+                        dish.vegetarian ? 'border-emerald-600' : 'border-rose-600'
+                      }`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          dish.vegetarian ? 'bg-emerald-600' : 'bg-rose-600'
+                        }`}
+                      />
                     </span>
-                    {dish.customizations && dish.customizations.length > 0 && (
-                      <span className="block text-[10px] text-[#2E7D58] font-medium">
-                        Customizable
+
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#65736C]">
+                      {dish.category}
+                    </span>
+
+                    {dish.isSpecial && (
+                      <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[9px] font-extrabold uppercase tracking-wide">
+                        Special
                       </span>
                     )}
                   </div>
 
                   <button
-                    id={`menu-add-btn-${dish.id}`}
-                    onClick={() => {
-                      if (dish.customizations && dish.customizations.length > 0) {
-                        setSelectedDishForDetail(dish);
-                      } else {
-                        addToCart(dish, 1);
-                      }
+                    id={`card-fav-btn-${dish.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavourite(dish.id);
                     }}
-                    className="flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-[#143627] hover:bg-[#235D43] text-white text-xs font-bold shadow-xs transition-all active:scale-95"
+                    className="p-1 rounded-full text-rose-500 hover:bg-rose-50 transition-colors"
+                    title="Toggle Favourite"
                   >
-                    <Plus className="w-3.5 h-3.5 text-[#C69234]" />
-                    <span>+ Add</span>
+                    <Heart
+                      className={`w-4 h-4 ${
+                        isFavourite(dish.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-400 hover:text-rose-500'
+                      }`}
+                    />
                   </button>
                 </div>
+
+                {/* Dish Name */}
+                <h3
+                  onClick={() => setSelectedDishForDetail(dish)}
+                  className="font-black text-[#143627] text-base sm:text-lg group-hover:text-[#DC2626] transition-colors leading-snug cursor-pointer uppercase tracking-tight"
+                >
+                  {dish.name}
+                </h3>
+
+                {/* Dish Description */}
+                <p className="mt-1 text-xs text-[#65736C] leading-relaxed">
+                  {dish.description}
+                </p>
+              </div>
+
+              {/* Bottom Row: Price & Action */}
+              <div className="mt-4 pt-3 border-t border-[#F2ECE1] flex items-center justify-between">
+                <div>
+                  <div className="flex items-baseline">
+                    <span className="text-xs font-bold text-[#DC2626]">₹</span>
+                    <span className="text-xl font-black text-[#143627] ml-0.5">
+                      {dish.price}
+                    </span>
+                  </div>
+                  {dish.customizations && dish.customizations.length > 0 && (
+                    <span className="block text-[10px] font-bold text-[#2E7D58]">
+                      Customizable
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  id={`menu-add-btn-${dish.id}`}
+                  onClick={() => {
+                    if (dish.customizations && dish.customizations.length > 0) {
+                      setSelectedDishForDetail(dish);
+                    } else {
+                      addToCart(dish, 1);
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#DC2626] hover:bg-[#b91c1c] text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add</span>
+                </button>
               </div>
             </div>
           ))}

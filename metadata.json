@@ -1,6 +1,6 @@
 {
-  "name": "Madras Leaf - A Multi Cuisine Restaurant",
-  "description": "Premium multi-cuisine dining and online ordering for Madras Leaf at Wave Mall, Ludhiana. Authentic South Indian, North Indian, Chinese, Biryani, Coffee & Beverages.",
+  "name": "Laa Mamma Mia! Taste Of Singapore",
+  "description": "Authentic Singaporean cuisine and delicious desserts at Laa Mamma Mia, Rajguru Nagar, Ludhiana. Featuring unique burgers, churros, and bubble waffles.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

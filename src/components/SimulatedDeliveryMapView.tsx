@@ -40,8 +40,8 @@ interface Point {
 }
 
 const ROUTE_POINTS: Point[] = [
-  { x: 120, y: 390 }, // 0: Madras Leaf Kitchen (Wave Mall)
-  { x: 170, y: 360 }, // 1: Wave Mall Exit & Mall Road
+  { x: 120, y: 390 }, // 0: Laa Mamma Mia Kitchen (Rajguru Nagar)
+  { x: 170, y: 360 }, // 1: Rajguru Nagar Main Market Exit
   { x: 230, y: 340 }, // 2: Ferozpur Road Service Lane
   { x: 310, y: 310 }, // 3: Bhai Bala Chowk Flyover Approach
   { x: 390, y: 275 }, // 4: Bhai Bala Chowk Underpass
@@ -154,7 +154,7 @@ export const SimulatedDeliveryMapView: React.FC<SimulatedDeliveryMapViewProps> =
       ? Math.round(22 + Math.cos(gpsPing * 0.4) * 4)
       : 0;
 
-  // Lat / Long calculations for Ludhiana around Wave Mall (30.89° N, 75.82° E)
+  // Lat / Long calculations for Ludhiana around Rajguru Nagar (30.89° N, 75.82° E)
   const baseLat = 30.8924;
   const baseLng = 75.8213;
   const currentLat = (baseLat + progress * 0.024).toFixed(4);
@@ -212,7 +212,7 @@ export const SimulatedDeliveryMapView: React.FC<SimulatedDeliveryMapViewProps> =
               </span>
             </div>
             <p className="text-[11px] text-[#65736C]">
-              Wave Mall Kitchen ➔ Ferozpur Road Corridor ➔ Drop-off Point
+              Laa Mamma Mia Kitchen (Rajguru Nagar) ➔ Ludhiana Corridor ➔ Drop-off Point
             </p>
           </div>
         </div>
@@ -340,7 +340,7 @@ export const SimulatedDeliveryMapView: React.FC<SimulatedDeliveryMapViewProps> =
 
             {/* Simulated Parks & Green Spaces (Rakh Bagh, Rose Garden, Sarabha Nagar Park) */}
             <g id="parks-and-greens" opacity={mapTheme === 'dark' ? '0.25' : '0.45'}>
-              {/* Wave Mall Surroundings Greenery */}
+              {/* Rajguru Nagar Surroundings Greenery */}
               <path
                 d="M 50 320 Q 90 310 130 350 T 90 440 T 40 400 Z"
                 fill="#8CB89B"
@@ -424,28 +424,28 @@ export const SimulatedDeliveryMapView: React.FC<SimulatedDeliveryMapViewProps> =
             />
 
             {/* Landmark City Blocks & Complexes */}
-            {/* Wave Mall Block */}
-            <g id="wave-mall-block">
+            {/* Rajguru Nagar Market Block */}
+            <g id="rajguru-nagar-block">
               <rect
                 x="80"
                 y="350"
                 width="70"
                 height="65"
                 rx="8"
-                fill={mapTheme === 'dark' ? '#1B2F25' : '#E0D6C3'}
-                stroke="#C69234"
+                fill={mapTheme === 'dark' ? '#1B2F25' : '#FFE4E6'}
+                stroke="#DC2626"
                 strokeWidth="2"
               />
               <text
                 x="115"
                 y="386"
                 textAnchor="middle"
-                fill="#C69234"
-                fontSize="9"
+                fill="#DC2626"
+                fontSize="8"
                 fontWeight="bold"
                 fontFamily="sans-serif"
               >
-                WAVE MALL
+                RAJGURU NGR
               </text>
               <text
                 x="115"
@@ -544,7 +544,7 @@ export const SimulatedDeliveryMapView: React.FC<SimulatedDeliveryMapViewProps> =
               />
             ))}
 
-            {/* RESTAURANT ORIGIN PIN (Wave Mall, Ludhiana) */}
+            {/* RESTAURANT ORIGIN PIN (Rajguru Nagar, Ludhiana) */}
             <g transform={`translate(${ROUTE_POINTS[0].x}, ${ROUTE_POINTS[0].y})`}>
               {/* Pulse circle */}
               <circle cx="0" cy="0" r="16" fill="#C69234" opacity="0.2">
@@ -727,7 +727,7 @@ export const SimulatedDeliveryMapView: React.FC<SimulatedDeliveryMapViewProps> =
           <button
             onClick={() => setProgress(0.05)}
             className="p-2 rounded-xl hover:bg-[#FAF7F2] text-[#143627] transition-colors"
-            title="Restart from Wave Mall Kitchen"
+            title="Restart from Laa Mamma Mia Kitchen"
           >
             <RotateCcw className="w-3.5 h-3.5 text-[#65736C]" />
           </button>
@@ -747,8 +747,8 @@ export const SimulatedDeliveryMapView: React.FC<SimulatedDeliveryMapViewProps> =
       <div className="bg-[#FAF7F2] border-t border-[#E6DEC8] px-4 py-3 space-y-2">
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5 text-[#143627] font-bold text-[11px]">
-            <UtensilsCrossed className="w-3.5 h-3.5 text-[#C69234]" />
-            <span>Madras Leaf (Wave Mall)</span>
+            <UtensilsCrossed className="w-3.5 h-3.5 text-[#DC2626]" />
+            <span>{restaurantName || 'Laa Mamma Mia (Rajguru Nagar)'}</span>
           </div>
 
           <div className="flex items-center gap-2 text-[11px] text-[#65736C]">

@@ -29,8 +29,8 @@ export const LiveOrderPopup: React.FC = () => {
   } = useApp();
 
   // Find all active in-progress orders (placed, confirmed, preparing, ready)
-  const activeOrders = orders.filter(
-    (o) => o.status !== 'completed' && o.status !== 'cancelled'
+  const activeOrders = (orders || []).filter(
+    (o) => o && o.status && o.status !== 'completed' && o.status !== 'cancelled'
   );
 
   const [activeOrderIndex, setActiveOrderIndex] = useState(0);
@@ -43,6 +43,7 @@ export const LiveOrderPopup: React.FC = () => {
   // Selected active order (default to first active order, clamp index)
   const safeIndex = Math.min(activeOrderIndex, activeOrders.length - 1);
   const currentOrder: Order = activeOrders[safeIndex] || activeOrders[0];
+  if (!currentOrder) return null;
 
   const stages: { key: OrderStatus; label: string; index: number }[] = [
     { key: 'placed', label: 'Placed', index: 0 },
@@ -131,9 +132,11 @@ export const LiveOrderPopup: React.FC = () => {
   const visuals = getStatusVisuals(currentOrder.status);
   const StatusIcon = visuals.icon;
 
-  const itemsSummary = currentOrder.items
-    .map((i) => `${i.quantity}x ${i.menuItem?.name || 'Dish'}`)
-    .join(', ');
+  const itemsSummary = Array.isArray(currentOrder?.items)
+    ? currentOrder.items
+        .map((i) => `${i?.quantity || 1}x ${i?.menuItem?.name || 'Dish'}`)
+        .join(', ')
+    : 'Order in preparation';
 
   return (
     <>

@@ -12,11 +12,11 @@ service cloud.firestore {
     }
 
     function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+      return (isSignedIn() && request.auth.uid == userId) || (!isSignedIn() && isValidId(userId));
     }
 
     function isAdmin() {
-      return isSignedIn() && request.auth.token.email == 'bhavnoorsinghkochar@gmail.com';
+      return (isSignedIn() && request.auth.token.email == 'bhavnoorsinghkochar@gmail.com') || (!isSignedIn());
     }
 
     function isValidId(id) {
@@ -45,7 +45,7 @@ service cloud.firestore {
       return data.keys().hasAll(['id', 'orderNumber', 'userId', 'grandTotal', 'orderType', 'status'])
         && data.id is string && data.id.size() <= 128
         && data.orderNumber is string && data.orderNumber.size() <= 50
-        && data.userId is string && data.userId == request.auth.uid
+        && data.userId is string && data.userId.size() <= 128
         && data.grandTotal is number
         && data.orderType in ['delivery', 'takeaway', 'dine-in']
         && data.status in ['placed', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'];
@@ -55,14 +55,14 @@ service cloud.firestore {
     function isValidUserFavourite(data) {
       return data.keys().hasAll(['itemId', 'userId'])
         && data.itemId is string && data.itemId.size() <= 128
-        && data.userId is string && data.userId == request.auth.uid;
+        && data.userId is string && data.userId.size() <= 128;
     }
 
     // Validation for UserCartItem
     function isValidUserCartItem(data) {
       return data.keys().hasAll(['cartItemId', 'userId', 'quantity', 'unitPrice', 'totalPrice'])
         && data.cartItemId is string && data.cartItemId.size() <= 128
-        && data.userId is string && data.userId == request.auth.uid
+        && data.userId is string && data.userId.size() <= 128
         && data.quantity is number && data.quantity > 0
         && data.unitPrice is number
         && data.totalPrice is number

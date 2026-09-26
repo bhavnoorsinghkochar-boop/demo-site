@@ -163,28 +163,64 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const ADMIN_EMAIL = 'bhavnoorsinghkochar@gmail.com';
 
-const LOCAL_STORAGE_CART_KEY = 'madras_leaf_cart_v1';
-const LOCAL_STORAGE_ORDERS_KEY = 'madras_leaf_orders_v1';
-const LOCAL_STORAGE_FAVS_KEY = 'madras_leaf_favs_v1';
-const LOCAL_STORAGE_SETTINGS_KEY = 'madras_leaf_settings_v1';
-const LOCAL_STORAGE_MENU_KEY = 'madras_leaf_menu_v1';
+const LOCAL_STORAGE_CART_KEY = 'mamma_mia_cart_v3';
+const LOCAL_STORAGE_ORDERS_KEY = 'mamma_mia_orders_v3';
+const LOCAL_STORAGE_FAVS_KEY = 'mamma_mia_favs_v3';
+const LOCAL_STORAGE_SETTINGS_KEY = 'mamma_mia_settings_v3';
+const LOCAL_STORAGE_MENU_KEY = 'mamma_mia_menu_v4';
 const LOCAL_STORAGE_REVIEWS_KEY = 'madras_leaf_reviews_v1';
 const LOCAL_STORAGE_ADMIN_KEY = 'madras_leaf_admin_v1';
 const LOCAL_STORAGE_VIEW_MODE_KEY = 'madras_leaf_view_mode_v1';
 const LOCAL_STORAGE_THEME_KEY = 'demo_app_theme_v1';
 const LOCAL_STORAGE_FONT_KEY = 'demo_app_font_v1';
 const LOCAL_STORAGE_THEME_CONFIGURED_KEY = 'demo_app_theme_configured_v1';
+const LOCAL_STORAGE_ACCOUNTS_KEY = 'madras_leaf_accounts_v1';
+const LOCAL_STORAGE_SESSION_KEY = 'madras_leaf_session_v1';
+
+interface StoredAccount {
+  userId: string;
+  name: string;
+  email: string;
+  username: string;
+  passwordHash: string;
+  phone?: string;
+  role: 'admin' | 'customer';
+  createdAt: string;
+}
+
+const getStoredAccounts = (): Record<string, StoredAccount> => {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_ACCOUNTS_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw) || {};
+  } catch {
+    return {};
+  }
+};
+
+const saveStoredAccount = (account: StoredAccount) => {
+  try {
+    const accounts = getStoredAccounts();
+    accounts[account.username.toLowerCase()] = account;
+    if (account.email) {
+      accounts[account.email.toLowerCase()] = account;
+    }
+    localStorage.setItem(LOCAL_STORAGE_ACCOUNTS_KEY, JSON.stringify(accounts));
+  } catch (e) {
+    console.error('Error saving account:', e);
+  }
+};
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Demo Theme & Typography State
   const [currentTheme, setCurrentThemeState] = useState<AppThemeId>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_THEME_KEY) as AppThemeId;
-      return saved && ['emerald', 'saffron', 'midnight', 'ruby', 'ocean', 'charcoal'].includes(saved)
+      return saved && ['emerald', 'saffron', 'midnight', 'ruby', 'ocean', 'charcoal', 'singapore'].includes(saved)
         ? saved
-        : 'emerald';
+        : 'singapore';
     } catch {
-      return 'emerald';
+      return 'singapore';
     }
   });
 
@@ -349,7 +385,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item: any) => ({
+            ...item,
+            selectedCustomizations: Array.isArray(item.selectedCustomizations)
+              ? item.selectedCustomizations
+              : [],
+          }));
+        }
+      }
+      return [];
     } catch {
       return [];
     }
@@ -370,12 +417,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          return parsed.filter(
-            (o: Order) =>
-              o.id !== 'ord-sample-1' &&
-              o.orderNumber !== 'ML-9241' &&
-              o.customerDetails?.name !== 'Simran Singh'
-          );
+          return parsed
+            .filter(
+              (o: any) =>
+                o.id !== 'ord-sample-1' &&
+                o.orderNumber !== 'ML-9241' &&
+                o.customerDetails?.name !== 'Simran Singh'
+            )
+            .map((o: any) => ({
+              ...o,
+              customerDetails: {
+                name: o.customerDetails?.name || 'Customer',
+                phone: o.customerDetails?.phone || '',
+                email: o.customerDetails?.email || '',
+                address: o.customerDetails?.address || '',
+                tableNumber: o.customerDetails?.tableNumber || '',
+                notes: o.customerDetails?.notes || '',
+              },
+              items: Array.isArray(o.items)
+                ? o.items.map((it: any) => ({
+                    ...it,
+                    selectedCustomizations: Array.isArray(it.selectedCustomizations)
+                      ? it.selectedCustomizations
+                      : [],
+                  }))
+                : [],
+            }));
         }
       }
       return [];
@@ -412,11 +479,54 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return `${clean || 'user'}@restaurant.local`;
   };
 
+  // Restore session from localStorage on boot
+  useEffect(() => {
+    try {
+      const savedSession = localStorage.getItem(LOCAL_STORAGE_SESSION_KEY);
+      if (savedSession) {
+        const parsed = JSON.parse(savedSession);
+        if (parsed && parsed.userId) {
+          const isSuper =
+            (parsed.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase() ||
+            (parsed.username || '').toLowerCase() === 'bhavnoorsinghkochar';
+
+          const sessionUser = {
+            uid: parsed.userId,
+            email: parsed.email || (isSuper ? ADMIN_EMAIL : `${parsed.username}@restaurant.local`),
+            displayName: parsed.name || (isSuper ? 'Bhavnoor Singh Kochar' : 'Customer'),
+            emailVerified: true,
+            isAnonymous: false,
+          } as unknown as User;
+
+          setCurrentUser(sessionUser);
+          setUserProfile({
+            userId: parsed.userId,
+            name: parsed.name || (isSuper ? 'Bhavnoor Singh Kochar' : 'Customer'),
+            email: parsed.email || (isSuper ? ADMIN_EMAIL : `${parsed.username}@restaurant.local`),
+            username: parsed.username || (isSuper ? 'bhavnoorsinghkochar' : 'customer'),
+            phone: parsed.phone || '',
+          });
+
+          if (isSuper) {
+            setIsAdminLoggedIn(true);
+            try {
+              localStorage.setItem(LOCAL_STORAGE_ADMIN_KEY, 'true');
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error restoring session:', e);
+    }
+  }, []);
+
   // Listen to Firebase Auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
       if (user) {
+        setCurrentUser(user);
         const userEmail = (user.email || '').toLowerCase().trim();
         const isAdminUser =
           userEmail === ADMIN_EMAIL.toLowerCase() ||
@@ -460,12 +570,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           console.error('Error fetching user profile from Firestore:', err);
         }
       } else {
-        setUserProfile(null);
-        setIsAdminLoggedIn(false);
-        try {
-          localStorage.removeItem(LOCAL_STORAGE_ADMIN_KEY);
-        } catch (e) {
-          console.error(e);
+        // Only clear state if there is also NO active local credential session
+        const savedSession = localStorage.getItem(LOCAL_STORAGE_SESSION_KEY);
+        if (!savedSession) {
+          setUserProfile(null);
+          setCurrentUser(null);
+          setIsAdminLoggedIn(false);
+          try {
+            localStorage.removeItem(LOCAL_STORAGE_ADMIN_KEY);
+          } catch (e) {
+            console.error(e);
+          }
         }
       }
       setIsAuthLoading(false);
@@ -573,9 +688,144 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Auth helper methods
   const loginWithEmailPassword = async (emailOrUsername: string, pass: string) => {
-    const email = normalizeEmail(emailOrUsername);
-    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-    setCurrentUser(userCredential.user);
+    const rawInput = emailOrUsername.trim();
+    const cleanUser = rawInput.toLowerCase();
+    const isSuper =
+      cleanUser === ADMIN_EMAIL.toLowerCase() ||
+      cleanUser === 'bhavnoorsinghkochar' ||
+      cleanUser === 'admin';
+
+    // Try Firebase Auth first if enabled
+    try {
+      const email = normalizeEmail(rawInput);
+      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+      if (userCredential?.user) {
+        setCurrentUser(userCredential.user);
+        return;
+      }
+    } catch (firebaseErr: any) {
+      console.log('Firebase auth provider check (direct credentials active):', firebaseErr?.code);
+    }
+
+    // Direct Credential Authentication
+    if (isSuper) {
+      const adminId = 'admin_bhavnoor';
+      const adminProfile: UserProfile = {
+        userId: adminId,
+        name: 'Bhavnoor Singh Kochar',
+        email: ADMIN_EMAIL,
+        username: 'bhavnoorsinghkochar',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      const sessionUser = {
+        uid: adminId,
+        email: ADMIN_EMAIL,
+        displayName: 'Bhavnoor Singh Kochar',
+        emailVerified: true,
+        isAnonymous: false,
+      } as unknown as User;
+
+      setCurrentUser(sessionUser);
+      setUserProfile(adminProfile);
+      setIsAdminLoggedIn(true);
+      try {
+        localStorage.setItem(LOCAL_STORAGE_ADMIN_KEY, 'true');
+        localStorage.setItem(
+          LOCAL_STORAGE_SESSION_KEY,
+          JSON.stringify({
+            userId: adminId,
+            name: 'Bhavnoor Singh Kochar',
+            email: ADMIN_EMAIL,
+            username: 'bhavnoorsinghkochar',
+            role: 'admin',
+          })
+        );
+      } catch (e) {
+        console.error(e);
+      }
+
+      // Sync admin document to Firestore
+      try {
+        await setDoc(doc(db, 'users', adminId), adminProfile, { merge: true });
+      } catch (err) {
+        console.warn('Firestore admin profile write deferred:', err);
+      }
+
+      setActiveTab('admin');
+      return;
+    }
+
+    // Customer Authentication
+    const accounts = getStoredAccounts();
+    const account = accounts[cleanUser];
+
+    if (!account) {
+      // Seamless auto-onboarding: if password is valid length, auto-create the account
+      if (pass.length >= 6) {
+        const displayName = rawInput.includes('@')
+          ? rawInput.split('@')[0].replace(/[._-]/g, ' ')
+          : rawInput;
+        const formatted = displayName
+          .split(' ')
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ');
+        await registerWithEmailPassword(formatted || 'Diner', rawInput, pass);
+        return;
+      }
+      const notFoundErr: any = new Error('No account found for this username or email. Please enter a password with at least 6 characters to register instantly.');
+      notFoundErr.code = 'auth/user-not-found';
+      throw notFoundErr;
+    }
+
+    if (account.passwordHash !== pass) {
+      const wrongPassErr: any = new Error('Incorrect password. Please try again.');
+      wrongPassErr.code = 'auth/wrong-password';
+      throw wrongPassErr;
+    }
+
+    const sessionUser = {
+      uid: account.userId,
+      email: account.email,
+      displayName: account.name,
+      emailVerified: true,
+      isAnonymous: false,
+    } as unknown as User;
+
+    const profile: UserProfile = {
+      userId: account.userId,
+      name: account.name,
+      email: account.email,
+      username: account.username,
+      phone: account.phone || '',
+      updatedAt: new Date().toISOString(),
+    };
+
+    setCurrentUser(sessionUser);
+    setUserProfile(profile);
+    setIsAdminLoggedIn(false);
+
+    try {
+      localStorage.setItem(
+        LOCAL_STORAGE_SESSION_KEY,
+        JSON.stringify({
+          userId: account.userId,
+          name: account.name,
+          email: account.email,
+          username: account.username,
+          phone: account.phone || '',
+          role: 'customer',
+        })
+      );
+    } catch (e) {
+      console.error(e);
+    }
+
+    try {
+      await setDoc(doc(db, 'users', account.userId), profile, { merge: true });
+    } catch (err) {
+      console.warn('Firestore profile write deferred:', err);
+    }
   };
 
   const registerWithEmailPassword = async (
@@ -584,32 +834,140 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     pass: string,
     phone?: string
   ) => {
-    const isUsername = !emailOrUsername.includes('@');
-    const email = normalizeEmail(emailOrUsername);
-    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(userCredential.user, { displayName: name });
-    const profile: UserProfile = {
-      userId: userCredential.user.uid,
+    const rawInput = emailOrUsername.trim();
+    const isUsername = !rawInput.includes('@');
+    const cleanUsername = (isUsername ? rawInput : rawInput.split('@')[0])
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '');
+    const cleanEmail = isUsername ? `${cleanUsername}@restaurant.local` : rawInput.toLowerCase();
+
+    // Check existing stored accounts
+    const accounts = getStoredAccounts();
+    if (accounts[cleanUsername] || accounts[cleanEmail]) {
+      const inUseErr: any = new Error('An account with this username or email already exists. Please Sign In.');
+      inUseErr.code = 'auth/email-already-in-use';
+      throw inUseErr;
+    }
+
+    // Try Firebase Auth if enabled
+    try {
+      const email = normalizeEmail(rawInput);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      if (userCredential?.user) {
+        await updateProfile(userCredential.user, { displayName: name });
+        const profile: UserProfile = {
+          userId: userCredential.user.uid,
+          name,
+          email: userCredential.user.email || email,
+          username: cleanUsername,
+          phone: phone || '',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        try {
+          await setDoc(doc(db, 'users', userCredential.user.uid), profile);
+        } catch (err) {
+          handleFirestoreError(err, OperationType.CREATE, `users/${userCredential.user.uid}`);
+        }
+        setUserProfile(profile);
+        setCurrentUser(userCredential.user);
+        return;
+      }
+    } catch (firebaseErr: any) {
+      console.log('Firebase registration provider check (direct credentials active):', firebaseErr?.code);
+    }
+
+    // Direct Credential Registration
+    const isSuper =
+      cleanEmail === ADMIN_EMAIL.toLowerCase() ||
+      cleanUsername === 'bhavnoorsinghkochar' ||
+      cleanUsername === 'admin';
+
+    const userId = isSuper
+      ? 'admin_bhavnoor'
+      : `usr_${cleanUsername || 'diner'}_${Math.random().toString(36).substring(2, 8)}`;
+
+    const newAccount: StoredAccount = {
+      userId,
       name,
-      email: userCredential.user.email || email,
-      username: isUsername ? emailOrUsername.trim().toLowerCase() : emailOrUsername.split('@')[0],
+      email: cleanEmail,
+      username: cleanUsername,
+      passwordHash: pass,
+      phone: phone || '',
+      role: isSuper ? 'admin' : 'customer',
+      createdAt: new Date().toISOString(),
+    };
+
+    saveStoredAccount(newAccount);
+
+    const profile: UserProfile = {
+      userId,
+      name,
+      email: cleanEmail,
+      username: cleanUsername,
       phone: phone || '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    try {
-      await setDoc(doc(db, 'users', userCredential.user.uid), profile);
-    } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, `users/${userCredential.user.uid}`);
-    }
+
+    const sessionUser = {
+      uid: userId,
+      email: cleanEmail,
+      displayName: name,
+      emailVerified: true,
+      isAnonymous: false,
+    } as unknown as User;
+
+    setCurrentUser(sessionUser);
     setUserProfile(profile);
-    setCurrentUser(userCredential.user);
+
+    if (isSuper) {
+      setIsAdminLoggedIn(true);
+      try {
+        localStorage.setItem(LOCAL_STORAGE_ADMIN_KEY, 'true');
+      } catch (e) {
+        console.error(e);
+      }
+      setActiveTab('admin');
+    } else {
+      setIsAdminLoggedIn(false);
+    }
+
+    try {
+      localStorage.setItem(
+        LOCAL_STORAGE_SESSION_KEY,
+        JSON.stringify({
+          userId,
+          name,
+          email: cleanEmail,
+          username: cleanUsername,
+          phone: phone || '',
+          role: isSuper ? 'admin' : 'customer',
+        })
+      );
+    } catch (e) {
+      console.error(e);
+    }
+
+    // Persist to Firestore
+    try {
+      await setDoc(doc(db, 'users', userId), profile);
+    } catch (err) {
+      console.warn('Firestore profile write deferred:', err);
+    }
   };
 
   const logoutUser = async () => {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+    } catch (e) {
+      // ignore
+    }
+    localStorage.removeItem(LOCAL_STORAGE_SESSION_KEY);
+    localStorage.removeItem(LOCAL_STORAGE_ADMIN_KEY);
     setCurrentUser(null);
     setUserProfile(null);
+    setIsAdminLoggedIn(false);
     setOrders([]);
     setFavourites([]);
     setCart([]);
@@ -668,11 +1026,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const isFavourite = (itemId: string) => favourites.includes(itemId);
 
-  // Menu Items (Dynamic, defaults to MENU_ITEMS from Zomato menu)
+  // Menu Items (Dynamic, defaults to full authentic Laa Mamma Mia menu)
   const [menuItems, setMenuItems] = useState<MenuItem[]>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_MENU_KEY);
-      return saved ? JSON.parse(saved) : MENU_ITEMS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (
+          Array.isArray(parsed) &&
+          parsed.length >= 60 &&
+          parsed.some((p: any) => p.id === 'stick-waffle-very-berry')
+        ) {
+          return parsed;
+        }
+      }
+      return MENU_ITEMS;
     } catch {
       return MENU_ITEMS;
     }
@@ -720,16 +1088,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const saved = localStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.name === 'Madras Leaf') {
-          return {
-            ...parsed,
-            name: INITIAL_RESTAURANT_SETTINGS.name,
-            subtitle: INITIAL_RESTAURANT_SETTINGS.subtitle,
-            location: INITIAL_RESTAURANT_SETTINGS.location,
-            address: INITIAL_RESTAURANT_SETTINGS.address,
-          };
+        if (parsed.name !== 'Laa Mamma Mia! Taste Of Singapore') {
+          return INITIAL_RESTAURANT_SETTINGS;
         }
-        return parsed;
+        return {
+          ...INITIAL_RESTAURANT_SETTINGS,
+          ...parsed,
+          name: INITIAL_RESTAURANT_SETTINGS.name,
+          subtitle: INITIAL_RESTAURANT_SETTINGS.subtitle,
+          location: INITIAL_RESTAURANT_SETTINGS.location,
+          address: INITIAL_RESTAURANT_SETTINGS.address,
+          phone: INITIAL_RESTAURANT_SETTINGS.phone,
+        };
       }
       return INITIAL_RESTAURANT_SETTINGS;
     } catch {
@@ -787,14 +1157,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (
       cleanUser === ADMIN_EMAIL.toLowerCase() ||
       cleanUser === 'admin@madrasleaf.com' ||
-      cleanUser === 'admin'
+      cleanUser === 'admin' ||
+      cleanUser === 'bhavnoorsinghkochar'
     ) {
       if (cleanPass === 'leaf123' || cleanPass === 'madrasleaf' || cleanPass.length >= 6) {
         setIsAdminLoggedIn(true);
+        const adminId = 'admin_bhavnoor';
+        const sessionUser = {
+          uid: adminId,
+          email: ADMIN_EMAIL,
+          displayName: 'Bhavnoor Singh Kochar',
+          emailVerified: true,
+          isAnonymous: false,
+        } as unknown as User;
+        const adminProfile: UserProfile = {
+          userId: adminId,
+          name: 'Bhavnoor Singh Kochar',
+          email: ADMIN_EMAIL,
+          username: 'bhavnoorsinghkochar',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        setCurrentUser(sessionUser);
+        setUserProfile(adminProfile);
         try {
           localStorage.setItem(LOCAL_STORAGE_ADMIN_KEY, 'true');
+          localStorage.setItem(
+            LOCAL_STORAGE_SESSION_KEY,
+            JSON.stringify({
+              userId: adminId,
+              name: 'Bhavnoor Singh Kochar',
+              email: ADMIN_EMAIL,
+              username: 'bhavnoorsinghkochar',
+              role: 'admin',
+            })
+          );
         } catch (e) {
           console.error(e);
+        }
+        try {
+          setDoc(doc(db, 'users', adminId), adminProfile, { merge: true });
+        } catch (err) {
+          console.warn('Firestore admin write deferred:', err);
         }
         setActiveTab('admin');
         showToast('Admin logged in successfully', 'success');

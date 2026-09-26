@@ -68,13 +68,13 @@ export const OrdersView: React.FC = () => {
   if (selectedOrderForDetails) {
     const destinationAddress =
       selectedOrderForDetails.orderType === 'delivery'
-        ? selectedOrderForDetails.customerDetails.address || 'Aggar Nagar, Ludhiana'
+        ? selectedOrderForDetails.customerDetails?.address || 'Aggar Nagar, Ludhiana'
         : selectedOrderForDetails.orderType === 'dine-in'
-        ? `Table ${selectedOrderForDetails.customerDetails.tableNumber || '4'}, 1st Floor Dining Hall, Wave Mall`
-        : '1st Floor Counter, Wave Mall, Ludhiana';
+        ? `Table ${selectedOrderForDetails.customerDetails?.tableNumber || '4'}, Booth No.20, Main Market, Rajguru Nagar`
+        : 'Counter Pickup, Booth No.20, Main Market, Rajguru Nagar, Ludhiana';
 
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
-      'Madras Leaf Wave Mall Ferozpur Road Ludhiana'
+      'Laa Mamma Mia Taste Of Singapore Booth No.20 Main Market Rajguru Nagar Ludhiana'
     )}&destination=${encodeURIComponent(destinationAddress)}`;
 
     return (
@@ -171,11 +171,15 @@ export const OrdersView: React.FC = () => {
                     <span className="font-bold text-[#143627]">
                       {item.quantity} × {item.menuItem.name}
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold">
-                      Pure Veg
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                      item.menuItem.vegetarian
+                        ? 'bg-emerald-50 text-emerald-800'
+                        : 'bg-rose-50 text-rose-800'
+                    }`}>
+                      {item.menuItem.vegetarian ? 'Veg' : 'Non-Veg'}
                     </span>
                   </div>
-                  {item.selectedCustomizations && item.selectedCustomizations.length > 0 && (
+                  {Array.isArray(item.selectedCustomizations) && item.selectedCustomizations.length > 0 && (
                     <p className="text-xs text-[#65736C]">
                       Custom: {item.selectedCustomizations.map((c) => `${c.optionName}${c.priceDelta > 0 ? ` (+₹${c.priceDelta})` : ''}`).join(', ')}
                     </p>
@@ -234,20 +238,22 @@ export const OrdersView: React.FC = () => {
               Recipient Details
             </span>
             <h4 className="font-bold text-sm text-[#143627]">
-              {selectedOrderForDetails.customerDetails.name}
+              {selectedOrderForDetails.customerDetails?.name || 'Customer'}
             </h4>
             <p className="text-xs text-[#65736C]">
-              Phone: <strong>{selectedOrderForDetails.customerDetails.phone}</strong>
+              Phone: <strong>{selectedOrderForDetails.customerDetails?.phone || 'On file'}</strong>
             </p>
-            <div className="pt-2">
-              <a
-                href={`tel:${selectedOrderForDetails.customerDetails.phone}`}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#235D43] hover:underline"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                <span>Call Contact Number</span>
-              </a>
-            </div>
+            {selectedOrderForDetails.customerDetails?.phone && (
+              <div className="pt-2">
+                <a
+                  href={`tel:${selectedOrderForDetails.customerDetails.phone}`}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#235D43] hover:underline"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>Call Contact Number</span>
+                </a>
+              </div>
+            )}
           </div>
 
           <div className="bg-white rounded-2xl border border-[#E6DEC8] p-5 space-y-2">
@@ -261,7 +267,7 @@ export const OrdersView: React.FC = () => {
             <p className="font-bold text-xs text-[#143627]">
               {destinationAddress}
             </p>
-            {selectedOrderForDetails.customerDetails.notes && (
+            {selectedOrderForDetails.customerDetails?.notes && (
               <p className="text-xs text-amber-800 bg-amber-50 p-2 rounded-lg">
                 <strong>Notes:</strong> {selectedOrderForDetails.customerDetails.notes}
               </p>

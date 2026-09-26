@@ -21,7 +21,7 @@ export const GalleryView: React.FC = () => {
             Gallery & Ambience
           </h1>
           <p className="text-xs sm:text-sm text-[#65736C] mt-1">
-            Glimpses of authentic food creations and dining at Wave Mall
+            Glimpses of desserts, handcrafted churros, burgers and vibes at Rajguru Nagar
           </p>
         </div>
 

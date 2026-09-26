@@ -2,19 +2,19 @@
 
 @layer base {
   :root {
-    --theme-primary: #143627;
-    --theme-primary-hover: #1b4733;
-    --theme-secondary: #235d43;
-    --theme-accent: #c69234;
-    --theme-accent-light: #faf0dc;
-    --theme-bg: #faf7f2;
+    --theme-primary: #dc2626;
+    --theme-primary-hover: #b91c1c;
+    --theme-secondary: #991b1b;
+    --theme-accent: #ef4444;
+    --theme-accent-light: #fee2e2;
+    --theme-bg: #fffbfb;
     --theme-surface: #ffffff;
-    --theme-border: #e6dec8;
-    --theme-text-primary: #143627;
-    --theme-text-muted: #65736c;
-    --theme-badge-bg: #e2f4ea;
-    --theme-badge-text: #235d43;
-    --font-heading: 'Cinzel', serif;
+    --theme-border: #fecaca;
+    --theme-text-primary: #450a0a;
+    --theme-text-muted: #7f1d1d;
+    --theme-badge-bg: #fee2e2;
+    --theme-badge-text: #991b1b;
+    --font-heading: 'Outfit', 'Cinzel', serif;
     --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
@@ -91,6 +91,21 @@
     --theme-text-muted: #71717a;
     --theme-badge-bg: #f4f4f5;
     --theme-badge-text: #18181b;
+  }
+
+  [data-theme="singapore"] {
+    --theme-primary: #dc2626;
+    --theme-primary-hover: #b91c1c;
+    --theme-secondary: #991b1b;
+    --theme-accent: #ef4444;
+    --theme-accent-light: #fee2e2;
+    --theme-bg: #fffbfb;
+    --theme-surface: #ffffff;
+    --theme-border: #fecaca;
+    --theme-text-primary: #450a0a;
+    --theme-text-muted: #7f1d1d;
+    --theme-badge-bg: #fee2e2;
+    --theme-badge-text: #991b1b;
   }
 
   [data-font="cinzel"] {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, ShieldCheck } from 'lucide-react';
+import { WhatsAppIcon, getWhatsAppUrl } from './WhatsAppButton';
 
 export const CartView: React.FC = () => {
   const {
@@ -30,7 +31,7 @@ export const CartView: React.FC = () => {
           Your Cart is Empty
         </h2>
         <p className="mt-2 text-sm text-[#65736C] max-w-sm mx-auto">
-          Explore Madras Leaf's delicious 100% pure veg multi-cuisine menu and add your favourite dishes.
+          Explore Laa Mamma Mia's delicious Taste of Singapore menu, gourmet burgers, handcrafted churros, and refreshing shakes.
         </p>
         <button
           id="cart-explore-menu-btn"
@@ -53,7 +54,7 @@ export const CartView: React.FC = () => {
             Your Cart
           </h1>
           <p className="text-xs text-[#65736C]">
-            {cart.length} item{cart.length > 1 ? 's' : ''} from Madras Leaf, Wave Mall
+            {cart.length} item{cart.length > 1 ? 's' : ''} from {restaurantSettings.name}, Rajguru Nagar
           </p>
         </div>
 
@@ -110,7 +111,7 @@ export const CartView: React.FC = () => {
                 </div>
 
                 {/* Customizations tags */}
-                {item.selectedCustomizations.length > 0 && (
+                {Array.isArray(item.selectedCustomizations) && item.selectedCustomizations.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {item.selectedCustomizations.map((c, i) => (
                       <span
@@ -208,18 +209,33 @@ export const CartView: React.FC = () => {
             </div>
 
             <div className="p-3 rounded-xl bg-[#FAF7F2] border border-[#E6DEC8] flex items-center gap-2 text-[11px] text-[#65736C]">
-              <ShieldCheck className="w-4 h-4 text-[#2E7D58] shrink-0" />
-              <span>100% Pure Veg Kitchen · Prepared fresh upon ordering</span>
+              <ShieldCheck className="w-4 h-4 text-[#DC2626] shrink-0" />
+              <span>Taste Of Singapore · Prepared fresh upon ordering</span>
             </div>
 
             <button
               id="proceed-to-checkout-btn"
               onClick={() => setIsCheckoutOpen(true)}
-              className="w-full py-3.5 px-4 rounded-2xl bg-[#143627] hover:bg-[#235D43] text-white font-bold text-sm sm:text-base shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 rounded-2xl bg-[#DC2626] hover:bg-[#b91c1c] text-white font-bold text-sm sm:text-base shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Proceed to Checkout</span>
-              <ArrowRight className="w-4 h-4 text-[#C69234]" />
+              <ArrowRight className="w-4 h-4 text-white" />
             </button>
+
+            <a
+              id="whatsapp-checkout-btn"
+              href={getWhatsAppUrl(
+                `Hello Laa Mamma Mia! I would like to order the following items from Rajguru Nagar:\n\n` +
+                  cart.map((i) => `• ${i.quantity}x ${i.menuItem.name} - ₹${i.totalPrice}`).join('\n') +
+                  `\n\nTotal: ₹${cartGrandTotal}\n\nPlease confirm preparation and delivery/pickup.`
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-sm shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
+            >
+              <WhatsAppIcon className="w-4 h-4 fill-current text-white" />
+              <span>Send Order to WhatsApp</span>
+            </a>
           </div>
         </div>
       </div>

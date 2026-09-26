@@ -131,7 +131,7 @@ export const CheckoutModal: React.FC = () => {
           {step === 1 && (
             <div className="space-y-3">
               <p className="text-xs text-[#65736C]">
-                How would you like to enjoy your food from Madras Leaf, Wave Mall?
+                How would you like to enjoy your order from {restaurantSettings.name}, Rajguru Nagar?
               </p>
 
               {/* Delivery */}
@@ -179,7 +179,7 @@ export const CheckoutModal: React.FC = () => {
                   <div>
                     <h4 className="font-bold text-sm sm:text-base">Takeaway / Pickup</h4>
                     <p className="text-xs text-[#65736C]">
-                      Pick up directly from 1st Floor, Wave Mall counter
+                      Pick up directly from Booth No.20, Rajguru Nagar counter
                     </p>
                   </div>
                 </div>
@@ -203,7 +203,7 @@ export const CheckoutModal: React.FC = () => {
                   <div>
                     <h4 className="font-bold text-sm sm:text-base">Dine-In at Restaurant</h4>
                     <p className="text-xs text-[#65736C]">
-                      Served fresh to your table at Wave Mall dining hall
+                      Served fresh to your table at Rajguru Nagar store
                     </p>
                   </div>
                 </div>

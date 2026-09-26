@@ -1,12 +1,12 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { isRestaurantOpen } from '../data/restaurantData';
+import { WhatsAppHeaderButton, WhatsAppIcon, getWhatsAppUrl } from './WhatsAppButton';
 import {
   Phone,
   ShoppingBag,
   Heart,
   Clock,
-  Palette,
   User,
   ShieldCheck,
 } from 'lucide-react';
@@ -18,7 +18,6 @@ export const Header: React.FC = () => {
     cartTotalCount,
     favourites,
     restaurantSettings,
-    setIsThemeModalOpen,
     orders,
     currentUser,
     userProfile,
@@ -38,29 +37,41 @@ export const Header: React.FC = () => {
       className="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-[#E6DEC8] transition-all"
     >
       {/* Top micro banner */}
-      <div className="bg-[#143627] text-[#FAF7F2] text-xs py-1.5 font-medium">
+      <div className="bg-[#DC2626] text-white text-xs py-1.5 font-medium shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 text-center sm:text-left">
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#235d43] text-emerald-100 font-semibold tracking-wide text-[11px]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
-              100% Pure Veg
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white text-red-700 font-bold tracking-wide text-[11px] shadow-2xs">
+              <span>⭐ 4.7 (65 Reviews)</span>
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1 text-emerald-100/90 text-xs">
-              <Clock className="w-3.5 h-3.5 text-[#C69234]" />
+            <span className="hidden sm:inline-flex items-center gap-1 text-white/95 text-xs font-semibold">
+              <Clock className="w-3.5 h-3.5 text-white" />
               Hours: {restaurantSettings.openingTime} – {restaurantSettings.closingTime}
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] sm:text-xs">
-            <span className="hidden md:inline-flex text-amber-200">
-              Happy Hours: {restaurantSettings.happyHours}
+          <div className="flex items-center gap-2.5 sm:gap-4 text-[11px] sm:text-xs font-semibold">
+            <span className="hidden md:inline-flex text-white/90">
+              Booth No.20, Rajguru Nagar, Ludhiana
             </span>
+
+            {/* Direct WhatsApp link with WhatsApp Logo */}
+            <a
+              id="top-whatsapp-link"
+              href={getWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-white hover:text-emerald-100 transition-colors bg-[#25D366] hover:bg-[#20ba59] px-2.5 py-0.5 rounded-md font-bold shadow-2xs"
+            >
+              <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
+              <span>WhatsApp Chat</span>
+            </a>
+
             <a
               id="header-phone-link"
               href={`tel:${restaurantSettings.phone.replace(/\s+/g, '')}`}
-              className="inline-flex items-center gap-1 text-emerald-100 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1 text-white hover:text-red-100 transition-colors bg-black/15 px-2.5 py-0.5 rounded-md"
             >
-              <Phone className="w-3 h-3 text-[#C69234]" />
+              <Phone className="w-3 h-3 text-white" />
               <span>{restaurantSettings.phone}</span>
             </a>
           </div>
@@ -70,48 +81,24 @@ export const Header: React.FC = () => {
       {/* Main navigation header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between gap-3 sm:gap-4">
-          {/* Logo brand area */}
+          {/* Brand Heading Area (No Logo Box, Large & High Visibility) */}
           <button
-            id="brand-logo-btn"
+            id="brand-heading-btn"
             onClick={() => setActiveTab('home')}
-            className="flex items-center gap-2.5 sm:gap-3 text-left group transition-transform active:scale-98 min-w-0"
+            className="flex flex-col text-left group transition-transform active:scale-98 min-w-0 py-0.5"
           >
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#143627] to-[#235D43] p-0.5 shadow-md flex items-center justify-center shrink-0">
-              {/* Custom leaf SVG motif */}
-              <svg
-                viewBox="0 0 36 36"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-7 h-7 text-[#FAF7F2] transform group-hover:rotate-6 transition-transform"
-              >
-                <path
-                  d="M18 4C9.5 4 4 11 4 19.5C4 28 11.5 32 18 32C24.5 32 32 28 32 19.5C32 11 26.5 4 18 4Z"
-                  fill="#1B4D36"
-                />
-                <path
-                  d="M18 6C25 12 28 18 28 22C28 26 23.5 29 18 29C12.5 29 8 26 8 22C8 18 11 12 18 6Z"
-                  fill="#2E7D58"
-                />
-                <path
-                  d="M18 7V28M18 13C21 15 24 16 26 16M18 17C14 19 11 19 9 20M18 21C22 22 25 22 26 23"
-                  stroke="#E8F5E9"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <h1 className="font-black text-2xl sm:text-3xl md:text-4xl tracking-tight text-[#DC2626] uppercase leading-none drop-shadow-2xs group-hover:text-[#b91c1c] transition-colors">
+                LAA MAMMA MIA!
+              </h1>
+              <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] sm:text-xs font-black uppercase tracking-wider border border-red-200">
+                Taste Of Singapore
+              </span>
             </div>
-
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-cinzel text-base sm:text-xl md:text-2xl font-bold tracking-wider text-[#143627] uppercase truncate">
-                  {restaurantSettings.name}
-                </span>
-                <span className="hidden sm:inline-block w-2 h-2 rounded-full bg-[#235D43] shrink-0" />
-              </div>
-              <p className="text-[10px] sm:text-xs font-medium text-[#65736C] tracking-wide uppercase truncate">
-                {restaurantSettings.subtitle}
-              </p>
-            </div>
+            <p className="text-[11px] sm:text-xs font-semibold text-[#65736C] tracking-wide mt-1 truncate">
+              <span className="sm:hidden font-bold text-red-700">Taste Of Singapore · </span>
+              Desserts, Burgers & Shakes · Rajguru Nagar
+            </p>
           </button>
 
           {/* Desktop Nav Links */}
@@ -131,8 +118,8 @@ export const Header: React.FC = () => {
                 onClick={() => setActiveTab(link.id as any)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all relative flex items-center gap-1.5 ${
                   activeTab === link.id
-                    ? 'bg-[#143627] text-white shadow-sm'
-                    : 'text-[#2C3B34] hover:bg-[#EAE2D3] hover:text-[#143627]'
+                    ? 'bg-[#DC2626] text-white shadow-sm'
+                    : 'text-[#2C3B34] hover:bg-[#FEE2E2] hover:text-[#DC2626]'
                 }`}
               >
                 <span>{link.label}</span>
@@ -163,17 +150,9 @@ export const Header: React.FC = () => {
           </nav>
 
           {/* Right Action Icons */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* Theme & Font Customizer Trigger Button */}
-            <button
-              id="header-theme-btn"
-              onClick={() => setIsThemeModalOpen(true)}
-              title="Customize App Theme & Font"
-              className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-[#E6DEC8] bg-white hover:bg-[#EAE2D3] text-[#143627] text-xs font-bold transition-all shadow-2xs cursor-pointer shrink-0"
-            >
-              <Palette className="w-4 h-4 text-[#C69234]" />
-              <span className="hidden sm:inline">Theme</span>
-            </button>
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            {/* WhatsApp Integration Button with WhatsApp Logo */}
+            <WhatsAppHeaderButton />
 
             {/* Live Open / Closed Pill */}
             <div
@@ -196,7 +175,7 @@ export const Header: React.FC = () => {
               id="header-favourites-btn"
               onClick={() => setActiveTab('favourites')}
               title="View Favourites"
-              className="hidden sm:flex relative p-2 sm:p-2.5 rounded-xl text-[#235D43] hover:bg-[#EAE2D3] transition-colors shrink-0"
+              className="hidden sm:flex relative p-2 sm:p-2.5 rounded-xl text-[#DC2626] hover:bg-[#FEE2E2] transition-colors shrink-0"
             >
               <Heart className="w-5 h-5" />
               {favourites.length > 0 && (
@@ -233,7 +212,7 @@ export const Header: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <div className="w-5 h-5 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-[#DC2626] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                       {userProfile?.name?.charAt(0) || currentUser.displayName?.charAt(0) || 'U'}
                     </div>
                     <span className="hidden sm:inline line-clamp-1 max-w-[80px]">
@@ -243,7 +222,7 @@ export const Header: React.FC = () => {
                 )
               ) : (
                 <>
-                  <User className="w-4 h-4 text-[#C69234]" />
+                  <User className="w-4 h-4 text-[#143627]" />
                   <span className="hidden sm:inline">Sign In</span>
                 </>
               )}
@@ -253,16 +232,16 @@ export const Header: React.FC = () => {
             <button
               id="header-cart-btn"
               onClick={() => setActiveTab('cart')}
-              className="relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl bg-[#143627] text-[#FAF7F2] font-semibold text-xs sm:text-sm shadow-md hover:bg-[#235D43] transition-all active:scale-95 cursor-pointer shrink-0"
+              className="relative flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-[#DC2626] hover:bg-[#b91c1c] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer shrink-0"
             >
-              <ShoppingBag className="w-4 h-4 text-[#C69234]" />
+              <ShoppingBag className="w-4 h-4" />
               <span className="hidden sm:inline">Cart</span>
               {cartTotalCount > 0 ? (
-                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[#C69234] text-white text-xs font-bold">
+                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-white text-[#DC2626] text-xs font-black shadow-xs">
                   {cartTotalCount}
                 </span>
               ) : (
-                <span className="hidden sm:inline text-xs text-emerald-200/80 font-normal">0</span>
+                <span className="hidden sm:inline text-xs text-red-200 font-normal">0</span>
               )}
             </button>
           </div>

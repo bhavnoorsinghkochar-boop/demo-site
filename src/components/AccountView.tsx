@@ -225,7 +225,7 @@ export const AccountView: React.FC = () => {
             <div>
               <span className="font-bold text-sm text-[#143627]">Location & Directions</span>
               <p className="text-xs text-[#65736C]">
-                Wave Mall, 1st Floor, Ferozpur Road, Ludhiana
+                Booth No.20, Main Market, Rajguru Nagar, Ludhiana
               </p>
             </div>
           </div>
